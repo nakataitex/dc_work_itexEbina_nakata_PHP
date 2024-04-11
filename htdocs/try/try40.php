@@ -39,7 +39,7 @@ $price_val;
         if ($result = $db->query($update)):
             $row = $db->affected_rows;
         else:
-            $error_msg[] = 'UPDATE実行エラー[実行SQL]' . $update;
+            $error_msg[] = 'UPDATE実行エラー[実行SQL]' . $update;//エラーメッセージ挿入
         endif;
 
 
@@ -47,11 +47,11 @@ $price_val;
     
         //エラーメッセージ格納の有無によりトランザクションの成否を判定
     
-        if (count($error_msg) == 0)://正常に更新したら
-            echo $row . '件更新した。';//更新ログ
+        if (count($error_msg) == 0)://エラーメッセージがないなら
+            echo $row . '件更新しました。';//更新ログ
             $db->commit();//コミット
         else://更新失敗したら
-            echo "更新失敗";//ログ
+            echo "更新失敗しました。";//ログ
             $db->rollback();//ロールバック
         endif;
         //下記はエラー確認用。エラー確認が必要な際にはコメントを外してください。
