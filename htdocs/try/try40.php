@@ -58,11 +58,11 @@ $price_val;
         var_dump($error_msg);
     endif;
 
-
+//クエリ
     $select = "SELECT product_name, price FROM product WHERE product_id = 1 ;";
-    if ($result = $db->query($select)):
+    if ($result = $db->query($select))://$dbに対して$selectを実行成功したら$resultにtrueを返す
         //連想配列を取得
-        while ($row = $result->fetch_assoc()):
+        while ($row = $result->fetch_assoc())://resultの連想配列を
             $product_name = $row["product_name"];
             $price = $row["price"];
         endwhile;
