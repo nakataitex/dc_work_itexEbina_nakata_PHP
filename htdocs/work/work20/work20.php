@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data"><!-- 画像送る為に必要 -->
         タイトル<br><input type="text" name="title"><br>
         書き込み内容<br><input type="text" name="text"><br>
         添付画像<br><input type="file" name="upload_image">
@@ -16,7 +16,7 @@
         <?
         $title = $_POST['title'];
         $text = $_POST['text'];
-        $image = $_POST['image'];
+        $image = $_POST['upload_image'];//image→upload_imageに変更
         //書き込み
         if ($_POST["title"] != '' || $_POST["text"] != ''):
             $fw = fopen("work20.txt", "a");
@@ -75,6 +75,7 @@
                     echo "while内のif1は動いてる<br>";
                     if(file_exists($image_path)):
                         echo "while内のif2は動いてる<br>";
+                        echo $image_path;
                         echo "<img src='$image_path' style='max-width: 200px;'><br>";
                     endif;
     //            endif;
