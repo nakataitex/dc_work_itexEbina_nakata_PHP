@@ -1,0 +1,192 @@
+<?php
+$host = 'localhost';
+$login_user = 'xb513874_fpu2g';
+$password = 'mj3mt8vtwv';
+$database = 'xb513874_u338x';
+$error_msg = [];
+//作成日、更新日管理
+date_default_timezone_set('Asia/Tokyo');
+$date = date("Y-m-d");
+?>
+
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>upload</title>
+</head>
+<style>
+    img {
+        width: 150px;
+        max-height: 150px;
+        object-fit: cover;
+    }
+
+    .image_list {
+        display: flex;
+        justify-content: space-between;
+        max-width: 800px;
+        font-size: 13px;
+    }
+
+    .image_tile {
+        width: 200px;
+        height: 250px;
+        border: solid;
+        list-style: none;
+        box-sizing: border-box;
+        vertical-align: middle;
+        margin: 0 auto;
+    }
+
+    .image_tile li {
+        vertical-align: middle;
+        margin: 0 auto;
+    }
+
+    .private {
+        background-color: #7d7d7d;
+    }
+</style>
+
+<body>
+    <form method="post" enctype="multipart/form-data">
+        タイトル<input type="text" name="image_name"><br>
+        ファイル<input type="file" name="img"><br>
+        公開<input type="radio" name="status" value="public" checked>
+        非公開<input type="radio" name="status" value="private"><br>
+        <input type="submit" value="投稿" name="share"><br>
+    </form>
+    <?php
+
+
+    //公開・非公開の判定(ここはOK)
+    $status = $_POST['status'];//ラジオボタンのステータスを取得
+    if ($status === "public"):
+        $public_flg = 1;
+    else:
+        $public_flg = 0;
+    endif;
+
+    $image_name = $_POST["image_name"];
+    $file_name = $_FILES['img']['name'];
+
+
+
+    //SQLにログイン(OK)
+    $db = new mysqli($host, $login_user, $password, $database);
+    if ($db->connect_error):
+        echo "DB接続エラー$db->connect_error<br>";
+        exit();
+    else:
+        $db->set_charset("utf8");
+    endif;
+
+    //画像とタイトルが送信されたら
+    if (isset($_POST["share"]))://シェアボタンを押したら
+        if ($_POST["image_name"] && $_FILES["img"])://タイトルと画像送信したら
+            $db->begin_transaction();//トランザクション開始
+            //投稿
+            $insert_query = "INSERT INTO image_sharing(
+                image_name,
+                public_flg,
+                create_date,
+                file_name
+                )
+            
+            VALUES(
+                '$image_name',
+                '$public_flg',
+                '$date',
+                '$file_name'
+            )";
+            //実行
+            if ($result = $db->query($insert_query)):
+                $row = $db->affected_rows;
+                //画像のアップロード処理
+                $image_path = 'img/' . basename($_FILES['img']['name']);
+                if (move_uploaded_file($_FILES['img']['tmp_name'], $image_path)):
+                else:
+                    echo "ファイルのアップロード失敗";
+                endif;
+            else:
+                $error_msg[] = 'INSERT実行エラー[実行SQL]' . $insert_query;
+            endif;
+
+            if (count($error_msg) > 0)://エラー時の処理
+                echo "画像の投稿に失敗しました";
+                $db->rollback();
+            else://成功時の処理
+                echo "画像$row 件の投稿に成功しました。<br>ファイル名：$image_name";
+
+                $db->commit();
+
+                //                var_dump($error_msg);
+            endif;
+        elseif ($_POST["image_name"] && empty($_FILES["img"])):
+            echo "画像が添付されていません";
+            exit();
+        elseif (empty($_POST["image_name"]) && $_FILES["img"]):
+            echo "名前が入力されていません";
+            exit();
+        endif;
+    endif;
+    ?>
+    <br><?php
+    $sql = "SELECT
+        image_id,
+        image_name,
+        public_flg,
+        create_date,
+        update_date,
+        file_name
+
+        FROM
+        image_sharing
+    ";
+    $image_manage_result = $db->query($sql);//クエリ実行
+    $img_dir = "./img/";
+    $images = array();
+    while ($row = $image_manage_result->fetch_assoc())://imagesに格納
+        $images[] = $row;
+    endwhile;
+
+    ?>
+    <form method="post">
+        <ul class="image_list">
+            <?php
+
+
+
+            foreach ($images as $image):
+                if ($image['public_flg'] == 1):
+                    echo '<li class="image_tile public">タイトル：' . $image["image_name"] . '
+                <p>ファイル名：' . $image["file_name"] . '</p>
+                <img src="' . $img_dir . $image['file_name'] . '" alt="' . $image_name . '">
+                <p>' . $public_manage . '</p>
+                <input type="submit" value = "非表示にする" name= "public[]">
+                </li>';
+                else:
+                    echo '<li class="image_tile public private">タイトル：' . $image['image_name'] . '
+                <p>ファイル名：' . $image["file_name"] . '</p>
+                <img src="' . $img_dir . $image['file_name'] . '" alt="' . $image_name . '">
+                <input type="submit" value = "表示する" name="public[]">
+                </li>';
+                endif;
+            endforeach;
+/* 
+            if(isset( $_POST["public"])):
+                for($i = 0; $i < count($image); $i++):
+                    
+                endfor;
+            endif;
+             */?>
+            <br>
+    </form>
+    </ul>
+    <a href="./image_view.php">画像一覧ページへ移動</a>
+</body>
+
+</html>
