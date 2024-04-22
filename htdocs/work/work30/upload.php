@@ -154,37 +154,80 @@ $date = date("Y-m-d");
     endwhile;
 
     ?>
-    <form method="post">
-        <ul class="image_list">
-            <?php
+
+    <ul class="image_list">
+        <?php
 
 
 
-            foreach ($images as $image):
-                if ($image['public_flg'] == 1):
-                    echo '<li class="image_tile public">タイトル：' . $image["image_name"] . '
-                <p>ファイル名：' . $image["file_name"] . '</p>
-                <img src="' . $img_dir . $image['file_name'] . '" alt="' . $image_name . '">
-                <p>' . $public_manage . '</p>
-                <input type="submit" value = "非表示にする" name= "public[]">
-                </li>';
-                else:
-                    echo '<li class="image_tile public private">タイトル：' . $image['image_name'] . '
-                <p>ファイル名：' . $image["file_name"] . '</p>
-                <img src="' . $img_dir . $image['file_name'] . '" alt="' . $image_name . '">
-                <input type="submit" value = "表示する" name="public[]">
-                </li>';
-                endif;
-            endforeach;
-/* 
-            if(isset( $_POST["public"])):
-                for($i = 0; $i < count($image); $i++):
-                    
-                endfor;
+        foreach ($images as $image):
+            $public_flg = $image['public_flg'];
+            if($public_flg ==1):
+                $public_messege = "非表示にする";
+                $public_class= "public";
+            else:
+                $public_messege = "表示する";
+                $public_class= "private";
             endif;
-             */?>
-            <br>
-    </form>
+                echo '<li class="image_tile '.$public_class.'">
+                    <form method="post">
+                    <input type="hidden" name="image_id" value="' . $image['image_id'] . '">
+                    タイトル：' . $image["image_name"] . '
+                <p>ファイル名：' . $image["file_name"] . '</p>
+                <img src="' . $img_dir . $image['file_name'] . '" alt="' . $image_name . '">
+                <input type="submit" value = "'.$public_messege.'" name="public_change">
+                </form>
+                </li>';
+        endforeach;
+
+/*         if (isset($_POST["image_id"])):
+            $get_image_id = $_POST['image_id'];
+            echo $get_image_id . 'のボタンを押した';
+            $public_change =
+                'UPDATE
+                    image_sharing
+                SET
+                    public_flg = 1 - public_flg
+                WHERE
+                image_id = ' . $_POST["image_id"] . ';';
+
+        endif; */
+
+        //画像の公開切り替え
+ if (isset($_POST["image_id"]))://公開/非公開を押したら
+    $get_image_id = $_POST['image_id'];
+    echo 'ID:'.$get_image_id.'のボタンを押した<br>';
+    $db->begin_transaction();//トランザクション開始
+    //公開切り替え
+    $public_change = 
+    'UPDATE
+        image_sharing
+    SET
+        public_flg = 1 - public_flg
+    WHERE
+    image_id = '.$_POST["image_id"].';';
+    //実行
+    if ($public_change_result = $db->query($public_change)):
+        $row = $db->affected_rows;
+        //クエリが実行出来るか
+        echo "クエリが実行できた<br>";
+    else:
+        $error_msg[] = 'INSERT実行エラー[実行SQL]' . $public_change;
+    endif;
+
+    if (count($error_msg) > 0)://エラー時の処理
+        echo "エラーが発生した為作業を取り消します。<br>";
+        $db->rollback();
+    else://成功時の処理
+        echo "$row 件の切り替えに成功しました。<br>切り替えた画像のID: $get_image_id";
+        $db->commit();
+
+        //var_dump($error_msg);
+    endif;
+endif; 
+        ?>
+        <br>
+        </form>
     </ul>
     <a href="./image_view.php">画像一覧ページへ移動</a>
 </body>
