@@ -1,7 +1,6 @@
 <?php
-
 //画像の公開切り替え
-if (isset($_POST["image_id"]))://公開/非公開を押したら
+ if (isset($_POST["image_id"]))://公開/非公開を押したら
     $get_image_id = $_POST['image_id'];
     echo 'ID:'.$get_image_id.'のボタンを押した<br>';
     $db->begin_transaction();//トランザクション開始
@@ -14,12 +13,12 @@ if (isset($_POST["image_id"]))://公開/非公開を押したら
     WHERE
     image_id = '.$_POST["image_id"].';';
     //実行
-    if ($public_change_result = $db->query($insert_query)):
+    if ($public_change_result = $db->query($public_change)):
         $row = $db->affected_rows;
         //クエリが実行出来るか
-        echo "クエリが実行できた<br>";
+        //echo "クエリが実行できた<br>";
     else:
-        $error_msg[] = 'INSERT実行エラー[実行SQL]' . $insert_query;
+        $error_msg[] = 'INSERT実行エラー[実行SQL]' . $public_change;
     endif;
 
     if (count($error_msg) > 0)://エラー時の処理
@@ -28,7 +27,6 @@ if (isset($_POST["image_id"]))://公開/非公開を押したら
     else://成功時の処理
         echo "$row 件の切り替えに成功しました。<br>切り替えた画像のID: $get_image_id";
         $db->commit();
-
         //var_dump($error_msg);
     endif;
 endif;
