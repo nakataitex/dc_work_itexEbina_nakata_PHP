@@ -4,6 +4,8 @@ $login_user = 'xb513874_fpu2g';
 $password = 'mj3mt8vtwv';
 $database = 'xb513874_u338x';
 $error_msg = [];
+$error_view =[];
+
 //作成日、更新日管理
 date_default_timezone_set('Asia/Tokyo');
 $date = date("Y-m-d");
@@ -169,8 +171,8 @@ $date = date("Y-m-d");
                 $public_messege = "表示する";
                 $public_class= "private";
             endif;
-                echo '<li class="image_tile '.$public_class.'">
-                    <form method="post">
+                echo '<li class="image_tile '.$public_class.' ">
+                    <form method="post" action ="">
                     <input type="hidden" name="image_id" value="' . $image['image_id'] . '">
                     タイトル：' . $image["image_name"] . '
                 <p>ファイル名：' . $image["file_name"] . '</p>
@@ -180,18 +182,6 @@ $date = date("Y-m-d");
                 </li>';
         endforeach;
 
-/*         if (isset($_POST["image_id"])):
-            $get_image_id = $_POST['image_id'];
-            echo $get_image_id . 'のボタンを押した';
-            $public_change =
-                'UPDATE
-                    image_sharing
-                SET
-                    public_flg = 1 - public_flg
-                WHERE
-                image_id = ' . $_POST["image_id"] . ';';
-
-        endif; */
 
         //画像の公開切り替え
  if (isset($_POST["image_id"]))://公開/非公開を押したら
@@ -210,7 +200,7 @@ $date = date("Y-m-d");
     if ($public_change_result = $db->query($public_change)):
         $row = $db->affected_rows;
         //クエリが実行出来るか
-        echo "クエリが実行できた<br>";
+        //echo "クエリが実行できた<br>";
     else:
         $error_msg[] = 'INSERT実行エラー[実行SQL]' . $public_change;
     endif;
@@ -221,7 +211,6 @@ $date = date("Y-m-d");
     else://成功時の処理
         echo "$row 件の切り替えに成功しました。<br>切り替えた画像のID: $get_image_id";
         $db->commit();
-
         //var_dump($error_msg);
     endif;
 endif; 
