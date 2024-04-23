@@ -21,14 +21,13 @@
     }
 
     //SELECT文の実行
-    $sql = "SELECT product_name, price FROM product WHERE price <= 100";
+    $sql = "SELECT * FROM product WHERE price <= 100";
     if($result = $db ->query($sql)){
         //連想配列を取得
-        while ($row = $result->fetch()):
+        while ($row = $result->fetchAll(PDO::FETCH_ASSOC)):
             echo $row["product_name"]. $row["price"]."<br>";
         endwhile;
-        
-        }
+    }
     ?>
 </body>
 </html>
