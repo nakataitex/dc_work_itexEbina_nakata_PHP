@@ -200,7 +200,7 @@ $date = date("Y-m-d");
                     echo '<li class="image_tile ' . $public_class . ' ">
                     <form method="post" action ="">
                     <input type="hidden" name="image_id" value="' . $image['image_id'] . '">
-                    タイトル：' . $image["image_name"] . '
+                    タイトル：' . htmlspecialchars($image["image_name"]) . '
                 <p>ファイル名：' . $image["file_name"] . '</p>
                 <img src="' . $img_dir . $image['file_name'] . '" alt="' . $image_name . '">
                 <input type="submit" value = "' . $public_messege . '" name="public_change">
