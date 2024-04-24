@@ -5,6 +5,7 @@ $password = 'mj3mt8vtwv';
 $database = 'xb513874_u338x';
 $error_msg = [];
 $error_view = [];
+$notifications = [];
 
 //作成日、更新日管理
 date_default_timezone_set('Asia/Tokyo');
@@ -52,15 +53,14 @@ $date = date("Y-m-d");
         background-color: #7d7d7d;
     }
 
-    .img_share {
+/*     .img_share {
         position: relative;
     }
 
     .messege {
         position: absolute;
         top: 30px;
-    }
-
+    } */
 
     .form {
         margin: 50px;
@@ -74,6 +74,22 @@ $date = date("Y-m-d");
 <body>
     <div class="img_share">
         <h1>画像投稿</h1>
+        <?php
+        if (!empty($notifications)):
+            echo '<div class = "notification_msg">';
+            foreach ($notifications as $notification):
+                echo '<p class =message>' . $notification . '</p>';
+            endforeach;
+            echo '</div>';
+        endif;
+        if (!empty($error_msg)):
+            echo '<div class = "error_msg">';
+            foreach ($error_msg as $msg):
+                echo '<p class =message>' . $msg . '</p>';
+            endforeach;
+            echo '</div>';
+        endif;
+        ?>
         <div class="form">
             <form method="post" enctype="multipart/form-data">
                 タイトル<input type="text" name="image_name"><br>
@@ -102,7 +118,7 @@ $date = date("Y-m-d");
             //SQLにログイン(OK)
             $db = new mysqli($host, $login_user, $password, $database);
             if ($db->connect_error):
-                echo '<p class="messege">DB接続エラー' . $db->connect_error . '</p><br>';
+                $notifications[] = '<p class="messege">DB接続エラー' . $db->connect_error . '</p><br>';
                 exit();
             else:
                 $db->set_charset("utf8");
@@ -114,7 +130,7 @@ $date = date("Y-m-d");
             //画像とタイトルが送信されたら
             if ($_SERVER['REQUEST_METHOD'] === 'POST'):
                 if (empty($_POST["image_name"]) && empty($_FILES["img"])):
-                    echo '<p class="messege">タイトルを入力し、画像を添付してください。</p>';
+                    $notifications[] = '<p class="messege">タイトルを入力し、画像を添付してください。</p>';
                 elseif (!empty($_POST['image_name']) && !empty($_FILES['img']))://タイトルと画像送信したら
                     $db->begin_transaction();//トランザクション開始
                     //投稿
@@ -138,26 +154,26 @@ $date = date("Y-m-d");
                         $image_path = 'img/' . basename($_FILES['img']['name']);
                         if (move_uploaded_file($_FILES['img']['tmp_name'], $image_path)):
                         else:
-                            echo '<p class="messege">ファイルのアップロード失敗</p>';
+                            $notifications[] = '<p class="messege">ファイルのアップロード失敗</p>';
                         endif;
                     else:
                         $error_msg[] = 'INSERT実行エラー[実行SQL]' . $insert_query;
                     endif;
 
                     if (count($error_msg) > 0)://エラー時の処理
-                        echo '<p class="messege">画像の投稿に失敗しました';
+                        $notifications[] = '<p class="messege">画像の投稿に失敗しました';
                         $db->rollback();
                     else://成功時の処理
-                        echo '<p class="messege">画像' . $row . '件の投稿に成功しました。<br>ファイル名：.' . $image_name;
+                        $notifications[] = '<p class="messege">画像' . $row . '件の投稿に成功しました。<br>ファイル名：.' . $image_name;
 
                         $db->commit();
 
                         //                var_dump($error_msg);
                     endif;
                 elseif (!empty($_POST["image_name"]) && empty($_FILES["img"])):
-                    echo '<p class="messege">画像が添付されていません</p>';
+                    $notifications[] = '<p class="messege">画像が添付されていません</p>';
                 elseif (empty($_POST["image_name"]) && !empty($_FILES["img"])):
-                    echo '<p class="messege">名前が入力されていません</p>';
+                    $notifications[] = '<p class="messege">名前が入力されていません</p>';
                 endif;
             endif;
 
@@ -231,10 +247,10 @@ $date = date("Y-m-d");
                     endif;
 
                     if (count($error_msg) > 0)://エラー時の処理
-                        echo '<p class="messege">エラーが発生した為作業を取り消します。</p><br>';
+                        $notifications[] = '<p class="messege">エラーが発生した為作業を取り消します。</p><br>';
                         $db->rollback();
                     else://成功時の処理
-                        echo '<p class="messege">' . $row . ' 件の切り替えに成功しました。<br>切り替えた画像のID: ' . $get_image_id;
+                        $notifications[] = '<p class="messege">' . $row . ' 件の切り替えに成功しました。<br>切り替えた画像のID: ' . $get_image_id;
                         $db->commit();
                         //var_dump($error_msg);
                     endif;
