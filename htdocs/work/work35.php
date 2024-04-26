@@ -7,12 +7,18 @@
 </head>
 <body>
     <?php
-    function_100(100);
+    $rand = rand(1,100);
+     function_i($rand);
+    function function_i($a){
+    if($a  %2 == 0):
+        echo $a.'は偶数なので10倍して'.$a *10;
 
-    function function_100($a){
-        echo "$a 倍すると";
-        echo rand(1,100)*$a;
-    }
+        else:
+            echo $a.'は奇数なので100倍して'.$a *100;
+            endif;
+
+        }
+            
 
     ?>
 </body>
