@@ -10,6 +10,10 @@
     img {
         width: 30%;
         height: 30%;
+        max-width: 200px;
+        max-height:200px;
+        display:block;
+        margin: 20px;
     }
 </style>
 
@@ -48,7 +52,7 @@
             echo "imgrecord.txtを読み込み成功<br>";
             foreach ($img_list_reverse as $img_filename)://配列を読み込み
                 if (!empty($img_filename))://内容があるなら
-                echo '<img src="' . $dir . $img_filename . '" alt="' . $img_filename . '">';//画像を表示
+                echo '<img src="' . $dir . $img_filename . '" alt="' . $img_filename . '"><br><hr>';//画像を表示
                 endif;
             endforeach;
         endif;
