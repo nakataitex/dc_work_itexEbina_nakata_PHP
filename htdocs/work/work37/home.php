@@ -25,9 +25,6 @@ $password = 'mj3mt8vtwv';
     $user_name = $_POST['user_name'];//入力したID
     $user_password = $_POST['pass'];//入力したパス
     
-    //ハッシュ化
-  //$hashed_password = password_hash($user_password, PASSWORD_DEFAULT);
-
     //SELECT文の実行(ネームからIDを追跡→あってるならそのIDのパスワードが合ってるか確認)
     $idcheck = 'SELECT 
                 user_name,password 
@@ -46,39 +43,44 @@ $password = 'mj3mt8vtwv';
     $result = $stmt->fetch(PDO::FETCH_NUM);
 
     if ($result):
-        echo 'ようこそ';
+        echo 'ようこそ' . $user_name . 'さん';
     else://ない場合
         echo "IDが存在しないかパスが違います";
     endif;
 
-//cookie
-
+    //cookie
+    
 
     //Cookieの保存期間
-define('EXPIRATION_PERIOD', 30);
-$cookie_expiration = time() + EXPIRATION_PERIOD * 60 * 24 * 365;
+    define('EXPIRATION_PERIOD', 30);
+    $cookie_expiration = time() + EXPIRATION_PERIOD * 60 * 24 * 365;
 
-//POSTされたフォームの値を変数に格納
-if(isset($_POST['cookie_confirmation']) === TRUE) {
-    $cookie_confirmation = $_POST['cookie_confirmation'];
-}else{
-    $cookie_confirmation = '';
-}
-if(isset($_POST['user_name']) === TRUE) {
-    $save_user_name = $_POST['user_name'];
-}    else{
-    $save_user_name = '';
-}
+    //POSTされたフォームの値を変数に格納
+    if (isset($_POST['cookie_confirmation']) === TRUE) {
+        $cookie_confirmation = $_POST['cookie_confirmation'];
+        echo "格納:cookie<br>";
+        var_dump($cookie_confirmation);
+    } else {
+        $cookie_confirmation = '';
+    }
+    if (isset($_POST['user_name']) === TRUE) {
+        $save_user_name = $_POST['user_name'];
+        echo "格納:user_name<br>";
+    } else {
+        $save_user_name = '';
+    }
 
-//チェックされてればcookie保存
-if ($cookie_confirmation === 'checked') {
-    setcookie('cookie_confirmation', $cookie_confirmation, $cookie_expiration);
-    setcookie('user_name', $save_user_name, $cookie_expiration);
-} else {
-    // チェックされていない場合はCookieを削除する
-    setcookie('cookie_confirmation', '', time() - 30);
-    setcookie('user_name', '', time() - 30);
-} 
+    //チェックされてればcookie保存
+    if ($cookie_confirmation === 'checked') {
+        setcookie('cookie_confirmation', $cookie_confirmation, $cookie_expiration);
+        setcookie('user_name', $save_user_name, $cookie_expiration);
+        echo "cookie保存";
+    } else {
+        // チェックされていない場合はCookieを削除する
+        setcookie('cookie_confirmation', '', time() - 30);
+        setcookie('user_name', '', time() - 30);
+        echo "削除";
+    }
 
     ?>
 </body>
