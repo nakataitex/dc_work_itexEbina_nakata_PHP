@@ -1,268 +1,276 @@
 <?php
-$host = 'localhost';
+//SQLの値を割当てるファンクション
+function SQL($bind_values, $db)
+{
+    foreach ($bind_values as $value1 => $value2) {
+        $db->bindValue($value1, $value2);
+    }
+}
+;
+
+
+//DB接続情報
+$host_dbname = 'mysql:host=localhost;dbname=xb513874_u338x';
 $login_user = 'xb513874_fpu2g';
 $password = 'mj3mt8vtwv';
-$database = 'xb513874_u338x';
-$error_msg = [];
-$error_view = [];
-$notifications = [];
+$msgs = [];
+$errors = [];
 
-//作成日、更新日管理
-date_default_timezone_set('Asia/Tokyo');
+//日付取得
+date_default_timezone_set("Asia/Tokyo");
 $date = date("Y-m-d");
-?>
 
+
+
+
+
+if ($_SERVER["REQUEST_METHOD"] === "POST"): //ポスト押されたら
+    if (isset($_POST["share"])):
+        /* 画像投稿機能 */
+        if (!empty($_POST["image_name"])):
+            if (is_uploaded_file($_FILES["picture"]["tmp_name"])): //両方送信した場合
+                if ($_FILES["picture"]["type"] === "image/jpeg" || $_FILES["picture"]["type"] === "image/png"): //拡張子の確認
+                    //変数
+                    $image_name = $_POST["image_name"]; //画像タイトル
+                    $file_name = $_FILES["picture"]["name"]; //ファイル名
+                    $file_path = 'img' . $file_name; //ファイルパス
+
+                    //公開・非公開の判定
+                    $status = $_POST['status']; //ラジオボタンのステータスを取得
+                    if ($status === "public"):
+                        $public_flg = 1;
+                    else:
+                        $public_flg = 0;
+                    endif;
+
+                    //画像投稿の処理開始
+                    try {
+                        //接続
+                        $pdo = new PDO($host_dbname, $login_user, $password);
+                        //エラー時にPDOExceptionにエラーを投げる
+                        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                        $pdo->beginTransaction(); //トランザクション開始
+                        //挿入のSQL文
+                        $insert = 'INSERT INTO 
+                    image_sharing (
+                        image_name,
+                        create_date,
+                        file_name,
+                        public_flg
+                    ) 
+                    VALUES(
+                        :image_name,
+                        :create_date,
+                        :file_name,
+                        :public_flg
+                    )';
+                        //プリペア
+                        $stmt = $pdo->prepare($insert);
+                        //挿入に使う値
+                        $insert_values = [
+                            ":public_flg" => $public_flg,
+                            ":create_date" => $date,
+                            ":file_name" => $file_name,
+                            ":image_name" => $image_name
+                        ];
+                        //値の割当
+                        SQL($insert_values, $stmt);
+                        //実行
+                        $result = $stmt->execute();
+                        //ファイル操作
+                        $file_path = 'img/' . basename($_FILES['picture']['name']);
+                        $file_move = move_uploaded_file($_FILES['picture']['tmp_name'], $file_path);
+                        if ($file_move):
+                        else:
+                            array_push($errors, '<p class="message">ファイルのアップロード失敗</p>');
+                        endif;
+                        if ($result && $file_move) {
+                            $pdo->commit();
+                            array_push($msgs, "投稿完了");
+                        } else {
+                            array_push($errors, "ファイルのアップロードに失敗しました。");
+                        }
+                    } catch (PDOException $e) {
+                        array_push($errors, "エラー：$e<br>");
+                        $pdo->rollBack();
+                    }
+                else:
+                    array_push($errors, "ファイル形式が不正です");
+                endif;
+            else:
+                array_push($errors, "画像が選択されていません。");
+            endif;
+        else:
+            if (is_uploaded_file($_FILES["picture"]["tmp_name"])): //画像だけ添付
+                array_push($errors, "タイトルが入力されていません。");
+            else:
+                array_push($errors, "タイトルを入力して画像を選択してください。");
+            endif;
+        endif;
+    endif;
+
+    //画像の公開切り替え
+    if (isset($_POST["image_id"])): //公開/非公開を押したら
+        $get_id = $_POST['image_id'];
+        try {
+            //接続
+            $pdo = new PDO($host_dbname, $login_user, $password);
+            //エラー時にPDOExceptionにエラーを投げる
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $pdo->beginTransaction(); //トランザクション開始
+            //更新のSQL文
+            $public_change =
+                'UPDATE 
+                    image_sharing 
+                SET 
+                public_flg = 1 - public_flg ,update_date = :update_date
+                WHERE 
+            image_id = :image_id';
+            //プリペア
+            $stmt = $pdo->prepare($public_change);
+            //更新に使う値
+            $update_values = [
+                ":image_id" => $get_id,
+                ":update_date" => $date
+            ];
+            //値の割当
+            SQL($update_values, $stmt);
+            //実行
+            $public_change_result = $stmt->execute();
+            if ($public_change_result) {
+                $pdo->commit();
+                array_push($msgs, "表示/非表示の切り替え完了");
+            } else {
+                array_push($errors, "表示の切り替えに失敗しました");
+            }
+        } catch (PDOException $e) {
+            array_push($errors, "エラー：$e");
+            $pdo->rollBack();
+        }
+    endif;
+
+endif;
+
+
+?>
 <!DOCTYPE html>
 <html lang="ja">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>upload</title>
+    <title>work36</title>
 </head>
 <style>
+    .error {
+        color: red;
+    }
+
+    .image_tile {
+        width: 300px;
+        height: 300px;
+        box-sizing: content-box;
+        margin: 0 auto;
+        line-height: 1.5;
+    }
+
     img {
-        width: 150px;
-        max-height: 150px;
-        object-fit: cover;
+        height: auto;
+        width: 100px;
     }
 
     .image_list {
         display: flex;
-        justify-content: space-between;
-        max-width: 800px;
-        font-size: 13px;
-    }
-
-    .image_tile {
-        width: 200px;
-        height: 250px;
-        border: solid;
         list-style: none;
-        box-sizing: border-box;
-        vertical-align: middle;
-        margin: 0 auto;
-    }
-
-    .image_tile li {
-        vertical-align: middle;
-        margin: 0 auto;
     }
 
     .private {
-        background-color: #7d7d7d;
-    }
-
-    /*     .img_share {
-        position: relative;
-    }
-
-    .messege {
-        position: absolute;
-        top: 30px;
-    } */
-
-    .form {
-        margin: 50px;
-    }
-
-    .img_manager {
-        margin: 50px;
+        background-color: grey;
     }
 </style>
 
 <body>
-    <div class="img_share">
-        <h1>画像投稿</h1>
+
+
+    <h1>画像投稿</h1>
+    <?php
+    //通知の表示
+    if ($msgs) {
+        foreach ($msgs as $msg) {
+            echo '<p class ="notification">' . $msg . '</p>';
+        }
+    }
+    if ($errors) {
+        foreach ($errors as $error) {
+            echo '<p class ="error">' . $error . '</p>';
+        }
+    }
+    ?>
+    <!-- フォーム -->
+    <form method="post" enctype="multipart/form-data">
+        タイトル：<input type="text" name="image_name"><br>
+        画像を選択：<input type="file" name="picture"><br>
+        公開<input type="radio" name="status" value="public"><br>
+        非公開<input type="radio" name="status" value="private" checked><br>
+        <input type="submit" value="送信" name="share">
+    </form>
+
+
+    <!-- 画像一覧の閲覧機能 -->
+    <ul class="image_list">
         <?php
-        if (!empty($notifications)):
-            echo '<div class = "notification_msg">';
-            foreach ($notifications as $notification):
-                echo '<p class =message>' . $notification . '</p>';
-            endforeach;
-            echo '</div>';
-        endif;
-        if (!empty($error_msg)):
-            echo '<div class = "error_msg">';
-            foreach ($error_msg as $msg):
-                echo '<p class =message>' . $msg . '</p>';
-            endforeach;
-            echo '</div>';
-        endif;
-        ?>
-        <div class="form">
-            <form method="post" enctype="multipart/form-data">
-                タイトル<input type="text" name="image_name"><br>
-                ファイル<input type="file" name="img"><br>
-                公開<input type="radio" name="status" value="public" checked>
-                非公開<input type="radio" name="status" value="private"><br>
-                <input type="submit" value="投稿" name="share"><br>
-            </form>
-        </div>
-
-        <div class="img_manager">
-            <?php
-            //公開・非公開の判定(ここはOK)
-            $status = $_POST['status'];//ラジオボタンのステータスを取得
-            if ($status === "public"):
-                $public_flg = 1;
-            else:
-                $public_flg = 0;
-            endif;
-
-            $image_name = $_POST["image_name"];
-            $file_name = $_FILES['img']['name'];
-
-
-
-            //SQLにログイン(OK)
-            $db = new mysqli($host, $login_user, $password, $database);
-            if ($db->connect_error):
-                $notifications[] = '<p class="messege">DB接続エラー' . $db->connect_error . '</p><br>';
-                exit();
-            else:
-                $db->set_charset("utf8");
-            endif;
-
-            $img = $_POST['image_title'] ?? '';
-            $imgfile = $_FILES['img'] ?? null;
-
-            //画像とタイトルが送信されたら
-            if ($_SERVER['REQUEST_METHOD'] === 'POST'):
-                if (empty($_POST["image_name"]) && empty($_FILES["img"])):
-                    $notifications[] = '<p class="messege">タイトルを入力し、画像を添付してください。</p>';
-                elseif (!empty($_POST['image_name']) && !empty($_FILES['img']))://タイトルと画像送信したら
-                    $db->begin_transaction();//トランザクション開始
-                    //投稿
-                    $insert_query = "INSERT INTO image_sharing(
-                            image_name,
-                            public_flg,
-                            create_date,
-                            file_name
-                            )
-            
-                            VALUES(
-                                '$image_name',
-                                '$public_flg',
-                                '$date',
-                                '$file_name'
-                            )";
-                    //実行
-                    if ($result = $db->query($insert_query)):
-                        $row = $db->affected_rows;
-                        //画像のアップロード処理
-                        $image_path = 'img/' . basename($_FILES['img']['name']);
-                        if (move_uploaded_file($_FILES['img']['tmp_name'], $image_path)):
-                        else:
-                            $notifications[] = '<p class="messege">ファイルのアップロード失敗</p>';
-                        endif;
-                    else:
-                        $error_msg[] = 'INSERT実行エラー[実行SQL]' . $insert_query;
-                    endif;
-
-                    if (count($error_msg) > 0)://エラー時の処理
-                        $notifications[] = '<p class="messege">画像の投稿に失敗しました';
-                        $db->rollback();
-                    else://成功時の処理
-                        $notifications[] = '<p class="messege">画像' . $row . '件の投稿に成功しました。<br>ファイル名：.' . $image_name;
-
-                        $db->commit();
-
-                        //                var_dump($error_msg);
-                    endif;
-                elseif (!empty($_POST["image_name"]) && empty($_FILES["img"])):
-                    $notifications[] = '<p class="messege">画像が添付されていません</p>';
-                elseif (empty($_POST["image_name"]) && !empty($_FILES["img"])):
-                    $notifications[] = '<p class="messege">名前が入力されていません</p>';
-                endif;
-            endif;
-
-            ?>
-            <br><?php
-            $sql = "SELECT
-        image_id,
-        image_name,
-        public_flg,
-        create_date,
-        update_date,
-        file_name
-
-        FROM
-        image_sharing
-    ";
-            $image_manage_result = $db->query($sql);//クエリ実行
+        //登録された画像のデータを取得
+        try {
+            //接続
+            $pdo = new PDO($host_dbname, $login_user, $password);
+            //エラー時にPDOExceptionにエラーを投げる
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            //挿入のSQL文
+            $select = "SELECT * FROM image_sharing";
+            $image_manage_result = $pdo->query($select); //クエリ実行
+            //ファイル操作
             $img_dir = "./img/";
-            $images = array();
-            while ($row = $image_manage_result->fetch_assoc())://imagesに格納
+            $images = [];
+            while ($row = $image_manage_result->fetch()): //imagesに格納
                 $images[] = $row;
             endwhile;
+        } catch (PDOException $e) {
+            array_push($errors, "エラー：$e<br>");
+        }
 
+        //表示切り替えのボタン
+        foreach ($images as $image):
+            switch ($image["public_flg"]):
+                case 1:
+                    $public_message = "非表示にする";
+                    $public_class = "public";
+                    break;
+                case 0:
+                    $public_message = "表示する";
+                    $public_class = "private";
+                    break;
+                default:
+                    $public_message = "ステータス異常(非公開にする)";
+                    $public_class = "private";
+                    break;
+            endswitch;
             ?>
-
-            <ul class="image_list">
-                <?php
-
-
-
-                foreach ($images as $image):
-                    $public_flg = $image['public_flg'];
-                    if ($public_flg == 1):
-                        $public_messege = "非表示にする";
-                        $public_class = "public";
-                    else:
-                        $public_messege = "表示する";
-                        $public_class = "private";
-                    endif;
-                    echo '<li class="image_tile ' . $public_class . ' ">
-                    <form method="post" action ="">
-                    <input type="hidden" name="image_id" value="' . $image['image_id'] . '">
-                    タイトル：' . htmlspecialchars($image["image_name"]) . '
-                <p>ファイル名：' . $image["file_name"] . '</p>
-                <img src="' . $img_dir . $image['file_name'] . '" alt="' . $image_name . '">
-                <input type="submit" value = "' . $public_messege . '" name="public_change">
+            <li class="image_tile <?php echo $public_class; ?>">
+                <form method="post">
+                    <input type="hidden" name="image_id" value="<?php echo $image['image_id']; ?>">
+                    <?php echo $image['image_id']; ?>
+                    <p>タイトル：<?php echo htmlspecialchars($image['image_name']); ?></p>
+                    <p>ファイル名：<?php echo $image["file_name"]; ?></p>
+                    <p>投稿日：<?php echo $image["create_date"]; ?></p>
+                    <p>更新日：<?php echo $image["update_date"]; ?></p>
+                    <img src="<?php echo $img_dir . $image['file_name']; ?>" alt="<?php echo $image["image_name"]; ?>">
+                    <input type="submit" value="<?php echo $public_message; ?>" name="public_change">
                 </form>
-                </li>';
-                endforeach;
-
-
-                //画像の公開切り替え
-                if (isset($_POST["image_id"]))://公開/非公開を押したら
-                    $get_image_id = $_POST['image_id'];
-                    $db->begin_transaction();//トランザクション開始
-                    //公開切り替え
-                    $public_change =
-                        'UPDATE
-        image_sharing
-    SET
-        public_flg = 1 - public_flg
-    WHERE
-    image_id = ' . $_POST["image_id"] . ';';
-                    //実行
-                    if ($public_change_result = $db->query($public_change)):
-                        $row = $db->affected_rows;
-                        //クエリが実行出来るか
-                        //echo "クエリが実行できた<br>";
-                    else:
-                        $error_msg[] = 'INSERT実行エラー[実行SQL]' . $public_change;
-                    endif;
-
-                    if (count($error_msg) > 0)://エラー時の処理
-                        $notifications[] = '<p class="messege">エラーが発生した為作業を取り消します。</p><br>';
-                        $db->rollback();
-                    else://成功時の処理
-                        $notifications[] = '<p class="messege">' . $row . ' 件の切り替えに成功しました。<br>切り替えた画像のID: ' . $get_image_id;
-                        $db->commit();
-                        //var_dump($error_msg);
-                    endif;
-                endif;
-                ?>
-                <br>
-                </form>
-            </ul>
-        </div>
-    </div>
-    <a href="./image_view.php">画像一覧ページへ移動</a>
-    </div>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+    <br>
+    <a href="view.php">閲覧画面へ移動</a>
 </body>
 
 </html>
