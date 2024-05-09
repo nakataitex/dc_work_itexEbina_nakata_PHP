@@ -109,18 +109,15 @@ function add_dir_to_list($array)
     return $array;
 }
 
-/**
- * 
- * 
- */
-
 
 /**
  * 表示切替ボタンの文字列の割り当て
  * 
- * 
+ * @param array
+ * @return array
  */
-function public_button_and_class($array){
+function public_button_and_class($array)
+{
     switch ($array["public_flg"]):
         case 1:
             $public_message = "非表示にする";
@@ -135,5 +132,5 @@ function public_button_and_class($array){
             $public_class = "private";
             break;
     endswitch;
-return ["public_message" =>$public_message, "public_class" => $public_class];
+    return ["public_message" => $public_message, "public_class" => $public_class];
 }

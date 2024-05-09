@@ -11,6 +11,19 @@
 <body>
     <div class="image_sharing">
         <h1>画像投稿</h1>
+        <?php
+        //通知の表示
+    if ($msgs) {
+        foreach ($msgs as $msg) {
+            echo '<p class ="notification">' . $msg . '</p>';
+        }
+    }
+    if ($errors) {
+        foreach ($errors as $error) {
+            echo '<p class ="error">' . $error . '</p>';
+        }
+    }
+    ?>
         <form method="post" enctype="multipart/form-data">
             タイトル：<input type="text" name="image_name"><br>
             画像を選択：<input type="file" name="picture"><br>
@@ -45,7 +58,8 @@
                 <td><img src="<?php print $value["dir"]; ?>" alt="<?php print $value["image_name"]; ?>"></td>
                 <td><input type="submit" name="" value="<?php print $public['public_message'] ?>"></td>
             </tr>
-        <?php } ?>
+        <?php 
+     } ?>
     </table>
 </body>
 

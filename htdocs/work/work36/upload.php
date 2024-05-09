@@ -195,6 +195,7 @@ endif;
     <h1>画像投稿</h1>
     <?php
     //通知の表示
+    var_dump($msgs);
     if ($msgs) {
         foreach ($msgs as $msg) {
             echo '<p class ="notification">' . $msg . '</p>';
