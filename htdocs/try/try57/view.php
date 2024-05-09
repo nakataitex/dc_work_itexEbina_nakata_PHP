@@ -17,7 +17,7 @@
         }
 
         caption {
-            textalign: left;
+            text-align: left;
         }
     </style>
 </head>
@@ -34,7 +34,8 @@
                 <td><?php print $value["product_name"]; ?></td>
                 <td><?php print $value["price"]; ?></td>
             </tr>
-        <?php } ?>
+        <?php }
+        var_dump(get_sql_result($pdo, $sql)) ?>
     </table>
 </body>
 

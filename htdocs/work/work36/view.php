@@ -65,10 +65,10 @@ $password = 'mj3mt8vtwv';
         }
         foreach ($images as $image) :
         ?><li class="image_tile <?php echo $public_class; ?>">
-                    <p>タイトル：<?php echo htmlspecialchars($image["image_title"]); ?></p>
+                    <p>タイトル：<?php echo htmlspecialchars($image["image_name"]); ?></p>
                     <p>投稿日：<?php echo $image["create_date"]; ?></p>
                     <p>更新日：<?php echo $image["update_date"]; ?></p>
-                    <img src="<?php echo $img_dir . $image['file_name']; ?>" alt="<?php echo $image["image_title"]; ?>">
+                    <img src="<?php echo $img_dir . $image['file_name']; ?>" alt="<?php echo $image["image_name"]; ?>">
             </li>
         <?php endforeach;
         ?>

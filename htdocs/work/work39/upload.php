@@ -255,13 +255,12 @@ endif;
                     break;
             endswitch;
             ?>
-            <!-- 各画像の項目 -->
             <li class="image_tile <?php echo $public_class; ?>">
                 <form method="post">
                     <input type="hidden" name="image_id" value="<?php echo $image['image_id']; ?>">
                     <?php echo $image['image_id']; ?>
                     <p>タイトル：<?php echo htmlspecialchars($image['image_name']); ?></p>
-                    <p>ファイル名：<?php echo htmlspecialchars($image["file_name"]); ?></p>
+                    <p>ファイル名：<?php echo $image["file_name"]; ?></p>
                     <p>投稿日：<?php echo $image["create_date"]; ?></p>
                     <p>更新日：<?php echo $image["update_date"]; ?></p>
                     <img src="<?php echo $img_dir . $image['file_name']; ?>" alt="<?php echo $image["image_name"]; ?>">
