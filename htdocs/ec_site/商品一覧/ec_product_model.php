@@ -20,6 +20,22 @@ function get_connection()
 
 
 /**
+ * 画像一覧にディレクトリ配列追加
+ * @param object 保存ディレクトリを指定
+ * @param array 画像一覧のデータ
+ * @return array 画像一覧のデータにディレクトリを追加
+ * 
+ */
+function add_dir_to_result($array)
+{
+    $dir = "./img/";    //画像のディレクトリ指定
+    foreach ($array as $key => $value):
+        $array[$key]["dir"] = $dir . $value["image_name"];
+    endforeach;
+    return $array;
+}
+
+/**
  * SQL文を実行・結果を配列で取得する
  * 
  * @param object 
@@ -88,21 +104,6 @@ function h_array($array)
 }
 
 
-/**
- * 画像一覧にディレクトリ配列追加
- * @param object 保存ディレクトリを指定
- * @param array 画像一覧のデータ
- * @return array 画像一覧のデータにディレクトリを追加
- * 
- */
-function add_dir_to_list($array)
-{
-    $dir = "./img/";    //画像のディレクトリ指定
-    foreach ($array as $key => $value):
-        $array[$key]["dir"] = $dir . $value["image_name"];
-    endforeach;
-    return $array;
-}
 
 
 /**

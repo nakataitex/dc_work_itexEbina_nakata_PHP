@@ -11,5 +11,9 @@ $product_data = get_product_list($pdo);
 $product_view_data = h_array($product_data);
 
 
-//view(view.php)読み込み これはテスト表示用。
-include_once 'ec_product_list_view.php';
+//view(view.php)読み込み これはテスト表示用
+/* include_once 'ec_product_list_view.php'; */
+
+
+//会員登録画面
+include_once "create_account_view.php";
