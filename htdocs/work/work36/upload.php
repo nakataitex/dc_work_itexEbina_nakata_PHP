@@ -272,7 +272,7 @@ endif;
         <?php endforeach; ?>
     </ul>
     <br>
-    <a href="view.php">閲覧画面へ移動</a>
+    <a href="image_list.php">閲覧画面へ移動</a>
 </body>
 
 </html>
