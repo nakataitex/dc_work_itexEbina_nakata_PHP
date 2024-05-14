@@ -1,27 +1,34 @@
 <?php
 //定数(const.php)を読み込む
-require_once 'const.php';
+require_once '../../../include/config/const.php';
 
-//Model(model.php)を読み込む
-require_once 'ec_product_model.php';
+//共通のModel(model.php)を読み込む
+require_once '../../../include/model/ec_model.php';
 
-$product_data = [];//商品データ
+//ユーザー登録画面のModel(ec_register_model.php)を読み込む
+require_once '../../../include/model/ec_register_model.php';
+
 $pdo = get_connection();//接続
-$product_data = get_product_list($pdo);
-$product_view_data = h_array($product_data);
+
+//セッションに使用する
+$form = [
+    "name" => "",
+    "password" => ""
+];
+$error = [];
 
 //コントローラ
 //フォームの内容をチェック
-if ($_SERVER["REQUEST_METHOD"] === "POST") { //ポストがあった時に動作
+if ($_SERVER["REQUEST_METHOD"] === "POST") { 
     //名前チェック
     $form["name"] = h($_POST["name"]);
     $error["name"] = validation($form["name"],5);
-    var_dump($error["name"]);
 
     //パスワードチェック
     $form["password"] = h($_POST["password"]);
     $error["password"] = validation($form["password"],8);
-    var_dump($error["password"]);
+
+    //var_dump($error);
 
     //エラーがない時
     if (empty($error)) {
@@ -30,10 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") { //ポストがあった時に動作
         exit();
     }
 }
-
-//view(view.php)読み込み これはテスト表示用
-// include_once 'ec_product_list_view.php'; 
  
  
-//会員登録画面
-include_once "register.php"; 
+//会員登録画面を表示
+include_once "../../../include/view/register_view.php"; 

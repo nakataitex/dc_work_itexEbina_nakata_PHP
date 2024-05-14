@@ -1,25 +1,6 @@
 <?php
 
 /**
- * DB接続をしてPDOインスタンスを返す
- *
- *
- *@return object $pdo
- */
-function get_connection()
-{
-    try {
-        // PDOインスタンスの生成
-        $pdo = new PDO(DSN, LOGIN_USER, PASSWORD);
-    } catch (PDOException $e) {
-        echo $e->getMessage();
-        exit();
-    }
-    return $pdo;
-}
-
-
-/**
  * 画像一覧にディレクトリ配列追加
  * @param object 保存ディレクトリを指定
  * @param array 画像一覧のデータ
@@ -66,44 +47,16 @@ function get_sql_result($pdo, $sql)
 
 function get_product_list($pdo)
 {
-    $sql = PRODUCT_MANAGEMENT;
+    $sql = "SELECT
+    *
+    FROM
+        ec_product_table
+        INNER JOIN ec_image_table
+        ON ec_product_table.product_id = ec_image_table.product_id 
+        JOIN ec_stock_table 
+        ON ec_image_table.product_id = ec_stock_table.product_id;";
     return get_sql_result($pdo, $sql);
 }
-
-
-/**
- * htmlspecialchars(特殊文字の変換)のラッパー関数
- *繰り返し使用するので、引数指定の繰り返しなど省略できるようにする
- *
- *@param string
- *@return string  
- */
-function h($str)
-{
-    return htmlspecialchars($str, ENT_QUOTES, "UTF-8");
-}
-
-
-/**
- *特殊文字の変換(二次元配列対応)
- *二次元配列で上のh()を使える様にするもの
- *
- *@param array
- *@return array
- */
-function h_array($array)
-{
-    //二次元配列をforeachでループさせる
-    foreach ($array as $keys => $values) {
-        foreach ($values as $key => $value) {
-            //ここの値にh関数を使用して置き換える
-            $array[$keys][$key] = h($value);
-        }
-    }
-    return $array;
-}
-
-
 
 
 /**
@@ -112,7 +65,7 @@ function h_array($array)
  * @param array
  * @return array
  */
-function public_button_and_class($array)
+function get_public_button_and_class($array)
 {
     switch ($array["public_flg"]):
         case 0:
@@ -131,5 +84,6 @@ function public_button_and_class($array)
             $public_status = "ステータス異常";
             break;
     endswitch;
-    return ["public_button" => $public_button, "public_class" => $public_class,"public_status" =>$public_status];
+    return ["public_button" => $public_button, "public_class" => $public_class, "public_status" => $public_status];
 }
+

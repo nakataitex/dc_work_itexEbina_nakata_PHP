@@ -44,7 +44,7 @@
             <th>画像</th>
             <th>在庫数</th>
             <th>価格</th>
-            <th>状態の切替</th>
+            <th>状態</th>
         </tr>
         <?php
         foreach ($product_view_data as $value) { ?>
@@ -55,9 +55,11 @@
                 <td><img src="<?php print $value["dir"]; ?>" alt="<?php print $value["image_name"]; ?>"></td>
                 <td><?php print $value["stock_qty"]; ?>個</td>
                 <td><?php print $value["price"]; ?>円</td>
-                <td><input type="submit" name="" value="<?php print $public['public_button'] ?>"></td>
+                <td><?php print $public["public_status"]; ?>
+                    <br>
+                <input type="submit" name="" value="<?php print $public['public_button'] ?>"></td>
             </tr>
-        <?php
+        <?php 
         } ?>
     </table>
 </body>
