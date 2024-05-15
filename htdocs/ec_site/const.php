@@ -13,6 +13,7 @@ define("MSG_ERR_BLANK", "* 半角英数で入力してください");
 define("MSG_ERR_LENGTH_NAME", "* 5文字以上入力してください");
 define("MSG_ERR_LENGTH_PASSWORD", "* 8文字以上入力してください");
 define("MSG_ERR_STRING", "* 半角英数以外が入力されています");
+define("MSG_ERR_DUPLICATE","このユーザー名は既に使用されています");
 
 
 //Cookieの保存期間

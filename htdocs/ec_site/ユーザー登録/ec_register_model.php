@@ -17,9 +17,16 @@ function validation($input, $min_length)
     if ($input !== "" && strlen($input) < $min_length) {
         $errors[] = "length";
     }
+    
     return $errors;
 }
 
+function duplicate_check($count_function,$errors){
+    if($count_function[0]["cnt"] > 0){
+        $errors[] = "duplicate";
+    }
+    return $errors;
+    }
 
 
 /**
@@ -53,6 +60,9 @@ function display_form_error($errorType, $errors)
                 echo '</p>';
             } elseif ($error === "string") {
                 echo '<p class="error">' . MSG_ERR_STRING . '</p>';
+            }
+            if($error === "duplicate"){
+                echo '<p class="error">'.MSG_ERR_DUPLICATE.'</p>';
             }
         }
     }

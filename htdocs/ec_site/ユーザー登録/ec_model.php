@@ -11,6 +11,7 @@ function get_connection()
     try {
         // PDOインスタンスの生成
         $pdo = new PDO(DSN, LOGIN_USER, PASSWORD);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } catch (PDOException $e) {
         echo $e->getMessage();
         exit();
@@ -18,6 +19,32 @@ function get_connection()
     return $pdo;
 }
 
+/**
+ * SQL実行用のファンクション
+ * 
+ * @param string
+ * @param array
+ * @return object
+ */
+function sql_fetch_data($sql, $params)
+{
+    $pdo = get_connection();
+    $pdo->beginTransaction();
+    //SQL
+    $stmt = $pdo->prepare($sql);
+
+    //バインド
+    foreach ($params as $key => $value) {
+        $stmt->bindValue($key, $value);
+    }
+    $result = $stmt->execute();
+    if($result){
+        $pdo->commit();
+    }else{
+        $pdo->rollBack();
+    }
+    return $result;
+}
 
 /**
  * htmlspecialchars(特殊文字の変換)のラッパー関数

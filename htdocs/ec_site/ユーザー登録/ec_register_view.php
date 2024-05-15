@@ -9,7 +9,7 @@ session_start();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>会員登録</title>
 
-    <link rel="stylesheet" href="#" />
+    <link rel="stylesheet" href="./css/register_style.css" />
 </head>
 
 <body>
@@ -20,7 +20,7 @@ session_start();
 
         <div id="content">
             <p>登録に必要な事項をご記入ください。</p>
-            <form action="" method="post" enctype="multipart/form-data">
+            <form action="" method="POST">
                 <dl>
                     <dt>ユーザー名<span class="required">必須</span>(半角英数で5文字以上)</dt>
                     <dd>
