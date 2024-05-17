@@ -1,14 +1,11 @@
 <?php
 session_start();
-var_dump($_SESSION["form"]);
 //定数(const.php)を読み込む
-require_once '../../../include/config/const.php';
+require_once '../../include/config/const.php';
 
 //共通のModel(model.php)を読み込む
-require_once '../../../include/model/ec_model.php';
+require_once '../../include/model/ec_model.php';
 
-//ユーザー登録画面のModel(ec_register_model.php)を読み込む
-require_once '../../../include/model/ec_register_model.php';
 
 if (isset($_SESSION["form"])) {
     $form = $_SESSION["form"];
@@ -40,4 +37,4 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
 
-require_once ('../../../include/view/ec_check_view.php');
+require_once ('../../include/view/ec_check_view.php');

@@ -1,12 +1,10 @@
 <?php
 //定数(const.php)を読み込む
-require_once '../../../include/config/const.php';
+require_once '../../include/config/const.php';
 
 //共通のModel(model.php)を読み込む
-require_once '../../../include/model/ec_model.php';
+require_once '../../include/model/ec_model.php';
 
-//ユーザー登録画面のModel(ec_register_model.php)を読み込む
-require_once '../../../include/model/ec_register_model.php';
 
 session_start();//セッションスタート
 $pdo = get_connection();//接続
@@ -53,4 +51,4 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
 //会員登録画面を表示
-include_once "../../../include/view/ec_register_view.php";
+include_once "../../include/view/ec_register_view.php";

@@ -5,7 +5,8 @@ define('LOGIN_USER', 'xb513874_fpu2g');
 define('PASSWORD', 'mj3mt8vtwv');
 
 
-//商品管理ページのSQLは書かない
+//ディレクトリ
+define('IMG_DIR','./assets/product/img/');//商品画像のディレクトリ
 
 //メッセージ
 //定数

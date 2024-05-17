@@ -1,9 +1,12 @@
 <?php
 //定数(const.php)を読み込む
-require_once 'const.php';
+require_once '../../include/config/const.php';
 
-//Model(model.php)を読み込む
-require_once 'ec_product_model.php';
+//Model(ec_odel.php)を読み込む
+require_once '../../include/model/ec_model.php';
+
+//Model(ec_product_model.php)を読み込む
+require_once '../../include/model/ec_product_model.php';
 
 $product_data = [];//商品データ
 $pdo = get_connection();//接続
@@ -32,8 +35,4 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") { //ポストがあった時に動作
 }
 
 //view(view.php)読み込み これはテスト表示用
-// include_once 'ec_product_list_view.php'; 
- 
- 
-//会員登録画面
-include_once "register.php"; 
+include_once '../../include/view/ec_product_view.php'; 

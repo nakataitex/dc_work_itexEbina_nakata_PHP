@@ -1,8 +1,20 @@
 <?php
-require_once("const.php");//定数
-require_once("ec_site_model.php");//model
+session_start();
+require_once ("../../include/config/const.php");//定数
+require_once ("../../include/model/ec_model.php");//model
 
-$cookie_check = cookie_read($_COOKIE);
+if ($_SESSION["login"] && $_SESION["user_name"] !== "ec_admin") {
+    $id = $_SESSION["user_id"];
+    $user = $_SESSION["user_name"];
+} else {
+    header("Location: ec_login.php");//ログイン出来ていなかったらログインページへ移動
+    exit();
+}
 
-//ログイン画面表示→ログイン出来てたらホーム画面
-include("login.php");
+
+echo "ようこそ $user さん<br>";
+echo "ユーザーID: $id<br>";
+echo "ユーザー名: $user";
+
+
+include_once ("../../include/view/ec_top_view.php");
