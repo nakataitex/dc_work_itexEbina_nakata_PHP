@@ -78,7 +78,7 @@ function sql_fetch_data($sql, $params)
     $result = $stmt->execute();
     if ($result) {
         if (strpos(strtoupper($sql), 'SELECT') !== false) {
-            $data = $stmt->fetchAll();  // SELECTクエリの場合はfetchAllを実行
+            $data = $stmt->fetchAll(PDO::FETCH_ASSOC);  // SELECTクエリの場合はfetchAllを実行
         } else {
             $data = $stmt->rowCount();  // INSERT、UPDATE、DELETEの場合は影響を受けた行数を返す
         }
