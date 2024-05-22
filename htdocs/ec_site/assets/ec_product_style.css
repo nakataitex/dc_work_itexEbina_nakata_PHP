@@ -1,0 +1,41 @@
+table,
+td,
+th {
+    border: solid black 1px;
+    width: 100px;
+    margin:0 auto;
+}
+
+body,.add_product {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+h1, a {
+    margin: 0.5em;
+}
+
+table {
+    width: 250px;
+}
+
+caption {
+    text-align: left;
+}
+
+img {
+    width: 200px;
+    height: auto;
+}
+
+.add_product {
+    border: thick double #32a1ce;
+    width: 400px;
+    height: 170px;
+    padding: 10px;
+}
+
+.private {
+    background-color: #808080;
+}
