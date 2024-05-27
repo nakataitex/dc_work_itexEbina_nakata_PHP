@@ -1,32 +1,4 @@
 <?php
-/**
- * 表示切替ボタンの文字列の割り当て
- * 
- * @param array
- * @return array
- */
-function get_public_button_and_class($array)
-{
-    switch ($array["public_flg"]):
-        case 0:
-            $public_button = "表示する";
-            $public_class = "private";
-            $public_status = "非公開";
-            break;
-        case 1:
-            $public_button = "非表示にする";
-            $public_class = "public";
-            $public_status = "公開";
-            break;
-        default:
-            $public_button = "ステータス異常(非公開にする)";
-            $public_class = "private";
-            $public_status = "ステータス異常";
-            break;
-    endswitch;
-    return ["public_button" => $public_button, "public_class" => $public_class, "public_status" => $public_status];
-}
-
 //商品登録
 function insert_product($pdo, $form)
 {
@@ -77,4 +49,39 @@ function insert_stock($pdo, $form)
         echo $e->getMessage();
         exit();
     }
+}
+
+//管理する商品をリスト化
+function get_product_list($pdo)
+{
+    $sql = "SELECT
+     * FROM ec_product_table 
+    INNER JOIN ec_image_table 
+    ON ec_product_table.product_id = ec_image_table.product_id 
+    JOIN ec_stock_table 
+    ON ec_image_table.product_id = ec_stock_table.product_id;";
+    return get_sql_result($pdo, $sql);
+}
+
+//管理者が表示と非表示を切り替える為のボタン
+function get_public_button_and_class($array)
+{
+    switch ($array["public_flg"]):
+        case 0:
+            $public_button = "表示する";
+            $public_class = "private";
+            $public_status = "非公開";
+            break;
+        case 1:
+            $public_button = "非表示にする";
+            $public_class = "public";
+            $public_status = "公開";
+            break;
+        default:
+            $public_button = "ステータス異常(非公開にする)";
+            $public_class = "private";
+            $public_status = "ステータス異常";
+            break;
+    endswitch;
+    return ["public_button" => $public_button, "public_class" => $public_class, "public_status" => $public_status];
 }

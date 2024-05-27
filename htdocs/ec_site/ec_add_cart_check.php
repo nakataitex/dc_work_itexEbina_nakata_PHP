@@ -36,7 +36,7 @@ if (isset($_SESSION['product']) && $_SESSION["product"] !== "") {
 
 if ($_SERVER['REQUEST_METHOD'] === "POST") {
     if (isset($_POST["entry"]))
-        $product = h($_SESSION["product"]);
+        $product = $_SESSION["product"];
     $pdo->beginTransaction();
     if (insert_product($pdo, $product)) {
         $product["product_id"] = $pdo->lastInsertId();
@@ -51,4 +51,9 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
         $pdo->rollBack();
     }
 }
+
+//CSSファイルの選択
+$stylesheet = "./assets/ec_style.css";
+
+////view(ec_product_manage_view.php)読み込み
 include_once "../../include/view/ec_add_product_check_view.php";

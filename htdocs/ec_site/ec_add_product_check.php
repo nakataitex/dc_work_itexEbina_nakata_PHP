@@ -51,4 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
         $pdo->rollBack();
     }
 }
+//CSSファイルの選択
+$stylesheet = "./assets/ec_style.css";
+
+$stylesheet = "./assets/ec_style.css";
 include_once "../../include/view/ec_add_product_check_view.php";

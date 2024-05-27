@@ -1,0 +1,128 @@
+body,
+.add_product {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+header {
+    position: fixed;
+    margin: 0 auto;
+    padding: 30px;
+    top: 0;
+    left: 0;
+    max-width: 10%;
+    height: 100%;
+    line-height: 26px;
+    background-color: #000000CB;
+    color: white;
+}
+
+.title,
+h2,
+.header_menu ul {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    padding: 5px;
+    margin: 0;
+}
+
+.title {
+    font-size: 26px;
+    color: #32a1ce;
+}
+
+.header_menu li a {
+    text-decoration: none;
+    color: rgb(159, 255, 223);
+
+}
+
+.contents {
+    z-index: 1;
+    margin-top: 50px;
+    margin-left: 10%;
+    max-width: 1000px;
+}
+
+.message_area {
+    border: solid #000000CB 1px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    width: 400px;
+    padding: 10px;
+}
+
+.error_message {
+    color: #ff00008f;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* リスト */
+table,
+td,
+th {
+    border: solid black 1px;
+    width: 150px;
+    margin: 0 auto;
+}
+
+table {
+    width: 250px;
+}
+
+caption {
+    text-align: left;
+}
+
+img {
+    width: 150px;
+    height: auto;
+}
+
+/* フォーム */
+.form_container {
+    background-color: #00000079;
+    width: 400px;
+    height: 200px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    width: 100%;
+    max-width: 300px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.private {
+    background-color: #808080;
+}
+
+footer {
+    z-index: -1;
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    bottom: 0;
+    width: 100%;
+    justify-content: flex-end;
+    padding-right: 100px;
+}
+
+.contact_information {
+    display: flex;
+}

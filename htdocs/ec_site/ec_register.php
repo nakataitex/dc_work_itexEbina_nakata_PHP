@@ -31,8 +31,8 @@ if (isset($_GET["action"]) && $_GET["action"] === "rewrite" && isset($_SESSION["
 //フォームの内容をチェック
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // 名前チェック
-    $form["name"] = h($_POST["name"]);
-    $message["error"]["name"] = validation($form["name"], 5);
+    $form["name"] = $_POST["name"];
+    $message["error"]["name"] = validation_user_password($form["name"], 5);
     $name_count_sql = "SELECT count(*) count from ec_user_table where user_name = :user_name";
     $name_param = [
         ":user_name" => $form["name"]
@@ -42,8 +42,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $message["error"]["name"][] = "duplicate";
     }
     // パスワードチェック
-    $form["password"] = h($_POST["password"]);
-    $message["error"]["password"] = validation($form["password"], 8);
+    $form["password"] = $_POST["password"];
+    $message["error"]["password"] = validation_user_password($form["password"], 8);
     // エラーがない時
     if (empty($message["error"]["name"]) && empty($message["error"]["password"])) {
         $_SESSION["form"] = $form;
@@ -52,5 +52,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 
+
+//CSSファイルの選択
+$stylesheet = "./assets/ec_style.css";
+//ページタイトル
+$page_title = "ユーザー登録";
+//CSSファイルの選択
+$menus = [
+    "./ec_login.php" => "ログイン"
+];
+
+//ログイン画面のヘッダーまでを読み込む
+include_once("../../include/view/ec_header_view.php");
 //会員登録画面を読み込む
 include_once "../../include/view/ec_register_view.php";
+//ログイン画面のフッターを読み込む
+include_once ('../../include/view/ec_footer_view.php');

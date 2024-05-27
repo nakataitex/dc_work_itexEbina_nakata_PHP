@@ -20,8 +20,8 @@ $password = "";
 $id = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $user = h($_POST["name"]);
-    $password = h($_POST["password"]);
+    $user = $_POST["name"];
+    $password = $_POST["password"];
     if ($user !== "" && $password != "") {
         try {
             $pdo = get_connection();
@@ -42,6 +42,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     }
                     header("Location: ./index.php");
                     exit();
+                } else{
+                    $message["error"]["login"][] = "login_failed";
                 }
             } else {
                 $message["error"]["login"][] = "login_failed";
@@ -55,5 +57,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 
+//CSSファイルの選択
+$stylesheet = "./assets/ec_style.css";
+//ページタイトル
+$page_title = "ログイン画面";
+//リンク
+$menus = [
+    "./ec_register.php" => "ユーザー登録",
+];
+
+//ログイン画面のヘッダーを読み込む
+include_once("../../include/view/ec_header_view.php");
 //ログインのView(ec_login_view.php)を読み込む
 include_once ('../../include/view/ec_login_view.php');
+//ログイン画面のフッターを読み込む
+include_once ('../../include/view/ec_footer_view.php');

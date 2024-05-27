@@ -1,4 +1,12 @@
 <?php
+//ログインしていなければログイン画面に遷移する
+function login_check(){
+    if (!isset($_SESSION["login"]) || !isset($_SESSION["user_name"]) || $_SESSION["user_name"] === "ec_admin") {
+        header("Location: ./ec_login.php");//管理者以外はログインページへ移動、ログインしてる場合はその後index.phpに移動
+        exit();
+    }
+}
+
 /**
  * DB接続をしてPDOインスタンスを返す
  *
@@ -41,32 +49,6 @@ function get_sql_result($pdo, $sql)
     return $data;
 }
 
-//移動させた方が良い
-/**
- * 画像データ取得
- *
- *@param object
- *@return array  
- */
-
-function get_product_list($pdo)
-{
-    $sql = "SELECT
-     * FROM ec_product_table 
-    INNER JOIN ec_image_table 
-    ON ec_product_table.product_id = ec_image_table.product_id 
-    JOIN ec_stock_table 
-    ON ec_image_table.product_id = ec_stock_table.product_id;";
-    return get_sql_result($pdo, $sql);
-}
-
-/**
- * SQLのupdate,insert実行用のファンクション
- * 
- * @param string
- * @param array
- * @return object
- */
 function sql_fetch_data($sql, $params)
 {
     $pdo = get_connection();
@@ -78,7 +60,11 @@ function sql_fetch_data($sql, $params)
     $result = $stmt->execute();
     if ($result) {
         if (strpos(strtoupper($sql), 'SELECT') !== false) {
-            $data = $stmt->fetchAll(PDO::FETCH_ASSOC);  // SELECTクエリの場合はfetchAllを実行
+            if ($stmt->rowCount() === 1) {
+                $data = $stmt->fetch(PDO::FETCH_ASSOC);  // 結果が1行だけの場合はfetchを実行
+            } else {
+                $data = $stmt->fetchAll(PDO::FETCH_ASSOC);  // 結果が複数行の場合はfetchAllを実行
+            }
         } else {
             $data = $stmt->rowCount();  // INSERT、UPDATE、DELETEの場合は影響を受けた行数を返す
         }
@@ -127,7 +113,7 @@ function h_array($array)
  * 
  * 
  */
-function validation($input, $min_length)
+function validation_user_password($input, $min_length)
 {
     $errors = [];
     if (!preg_match("/^[a-zA-Z0-9_]+$/", $input)) {
@@ -156,7 +142,8 @@ function duplicate_check($sql, $params)
 }
 
 //今日の日付をタイムゾーンAsia/Tokyoで取得し"Y-m-d"形式で返す
-function current_date(){
+function current_date()
+{
     date_default_timezone_set("Asia/Tokyo");
     return date("Y-m-d");
 }
@@ -164,7 +151,8 @@ function current_date(){
 //メッセージの種類を受取り、すべて画面に表示する
 function display_message($messages, $message_list)
 {
-    if (isset($messages) && isset($message_list)) {
+    if (!empty($messages) && !empty($message_list)) {
+        echo '<div class="message_area">';
         foreach ($messages as $type => $fields) {
             if (isset($message_list[$type])) {
                 foreach ($fields as $field => $statuses) {
@@ -178,6 +166,24 @@ function display_message($messages, $message_list)
                 }
             }
         }
+        echo '</div>';
     }
 }
 
+
+//正の数、かつ整数であるかのバリデーション
+function validation_int($value)
+{
+    if (filter_var($value, FILTER_VALIDATE_INT) !== false && $value >= 0) {
+        return true;
+    }
+    return false;
+}
+
+//DBから受け取った結果が単一だった場合配列化して他の関数で流用出来るようにする
+function array_convert_product_data($data){
+    if(isset($data["product_id"])){
+        $data = [$data];
+    }
+    return $data;
+}

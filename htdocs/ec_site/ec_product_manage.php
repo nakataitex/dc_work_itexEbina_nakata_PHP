@@ -1,5 +1,6 @@
 <?php
 session_start();
+//ここも関数化出来そう
 if ($_SESSION["login"] && isset($_SESSION["user_name"]) && $_SESSION["user_name"] === "ec_admin") {
     $id = $_SESSION["user_id"];
     $user = $_SESSION["user_name"];
@@ -41,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") { //ポストがあった時に動作
     if (isset($_POST["add_product"])) {//商品追加のボタンを押した時
         //名前の重複確認
         if (isset($_POST["product_name"]) && $_POST["product_name"] !== "") {
-            $form["product_name"] = h($_POST["product_name"]);
+            $form["product_name"] = $_POST["product_name"];
             $product_name_count_sql = "SELECT count(*) count from ec_product_table where product_name = :product_name";
             $product_name_param = [
                 ":product_name" => $form["product_name"]
@@ -56,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") { //ポストがあった時に動作
         //値段が数字か確認
         if (isset($_POST["price"]) && $_POST["price"] !== "") {
             $price = $_POST["price"];
-            if (!is_numeric($price) && $price < 0) {//値段が0以下で登録出来ない様にする
+            if (!validation_int($price) || $price < 0) {//値段が0以下で登録出来ない様にする
                 $message["error"]["string"][] = "price";
             } else {
                 $form["price"] = (int) $price;
@@ -66,11 +67,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") { //ポストがあった時に動作
         }
         //在庫数が数字か確認
         if (isset($_POST["stock_qty"]) && $_POST["stock_qty"] !== "") {
-            $stock_qty = $_POST["stock_qty"];
-            if (!is_numeric($stock_qty) && $stock_qty < 0) {//値段が0以下で登録出来ない様にする
+            $stock_qty_check = $_POST["stock_qty"];
+            if (!validation_int($stock_qty_check) || $stock_qty_check < 0) {//値段が0未満か整数でない場合登録出来ない様にする
                 $message["error"]["stock_qty"][] = "int";
             } else {
-                $form["stock_qty"] = (int) $stock_qty;
+                $form["stock_qty"] = (int) $stock_qty_check;
             }
         } else {
             $message["error"]["product_manage"][] = "qty_blank";
@@ -88,7 +89,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") { //ポストがあった時に動作
                 }
                 $image_dir = "./assets/img/";
                 $upload_file = $image_dir . $form["image_name"];
-                if (empty($message["error"]["image"]) && !move_uploaded_file($temp_file, $upload_file)) {
+                if (empty($message["error"]["product_manage"]) && !move_uploaded_file($temp_file, $upload_file)) {
                     $message["error"]["product_manage"][] = "upload";
                 }
             } else {
@@ -114,8 +115,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") { //ポストがあった時に動作
             header("Location: ec_add_product_check.php");
             exit();
         }
-    }//ここまでadd_product
-
+    }
     //ここから公開・非公開を切り替えるボタン
     if (isset($_POST["toggle_public"])) {
         try {
@@ -143,9 +143,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") { //ポストがあった時に動作
         }
     }
 }
+//ファイル形式が違う場合のエラー修正
+//数量変更機能
+//削除機能
+//通知メッセージ(エラー、処理完了)
+//ログアウトリンク
 
+//商品一覧を取得
 $product_data = get_product_list($pdo);
 $product_view_data = h_array($product_data);
+
+//CSSファイルの選択
+$stylesheet = "./assets/ec_style.css";
+//ページタイトル
+$page_title = "商品管理ページ";
+//ページリンク
+$menus = [
+    "./ec_logout.php" => "ログアウト"
+];
+
+//ログイン画面のヘッダーまでを読み込む
+include_once("../../include/view/ec_header_view.php");
 
 //view(view.php)読み込み これはテスト表示用
 include_once '../../include/view/ec_product_manage_view.php';

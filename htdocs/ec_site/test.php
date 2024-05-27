@@ -22,7 +22,7 @@ $message = [];
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // 名前チェック
     $form["name"] = h($_POST["name"]);
-    $message["name"] = validation($form["name"], 5);
+    $message["name"] = validation_user_password($form["name"], 5);
 
     $name_count_sql = "SELECT count(*) cnt from ec_user_table where user_name = :user_name";
     $name_param = [
@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // パスワードチェック
     $form["password"] = h($_POST["password"]);
-    $message["password"] = validation($form["password"], 8);
+    $message["password"] = validation_user_password($form["password"], 8);
 
     // エラーがない時
     if (empty($message["name"]) && empty($message["password"])) {

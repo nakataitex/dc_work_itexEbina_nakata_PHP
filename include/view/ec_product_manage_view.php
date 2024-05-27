@@ -1,27 +1,9 @@
-<!DOCTYPE html>
-<html lang="ja">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[ECサイト]商品管理ページ</title>
-    <link rel="stylesheet" href="./assets/ec_product_style.css">
-</head>
-
-<body>
     <h1>商品管理ページ</h1>
-    <div class="menu">
-        <a href="./ec_logout.php">ログアウト</a>
-    </div>
-    <?php
-    //通知の表示
-    echo display_message($message, $message_list);
-    ?>
-    <div class="add_product">
+    <div class="form_container">
         <form method="post" enctype="multipart/form-data">
             商品名：<input type="text" name="product_name" required><br>
-            価格：<input type="number" name="price" step="1" min="0" required><br>
-            在庫数：<input type="number" name="stock_qty" step="1" min="0" required><br>
+            価格：<input type="number" name="price" step="1" min="0" max="99999999" required><br>
+            在庫数：<input type="number" name="stock_qty" step="1" min="0" max="99999999" required><br>
             画像を選択：<input type="file" name="image" required><br>
             公開<input type="radio" name="public_flg" value="public">
             非公開<input type="radio" name="public_flg" value="private" checked><br>
