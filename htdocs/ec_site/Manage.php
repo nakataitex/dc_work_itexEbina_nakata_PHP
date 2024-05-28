@@ -8,86 +8,55 @@ require_once '../../include/model/ManageModel.php';
 
 session_start();
 adminCheck();
-
-$product_data = [];//商品データ
+/* $product_data = [];//商品データ */
 $message = [];
 $error_message = [];
 $pdo = getConnection();
 $action = $_POST["action"] ?? "";
+$product_name = isset($post['product_name']) ? $post['product_name'] : '';
+$price = isset($post['price']) ? $post['price'] : 0;
+$public_flg = isset($post['public_flg']) ? $post['public_flg'] : 0;
+$image = isset($post['image']) ? $post['image'] : '';
+
 
 //追加
 if ($action === "add") {
-    try {
-        $pdo->beginTransaction();
-        $error_message = validationAddProduct($pdo, $error_message);
+    if (isset($_POST["product_name"]) && isset($_POST["price"]) && isset($_POST["stock_qty"]) && $_POST["stock_qty"] >= 0 && isset($_FILES["image"]) && isset($_POST["public_flg"])) {
+        $error_message = addProductManage($error_message);
         if (empty($error_message)) {
-            $error_message = addProduct($pdo, $error_message);
-            if (empty($error_message)) {
-                $pdo->commit();
-                $message[] = "商品を追加しました";
-            } else {
-                $pdo->rollBack();
-            }
+            $message[] = "商品の追加に成功しました";
         }
-    } catch (PDOException $e) {
-        $error_message[] = $e->getMessage();
-        $pdo->rollBack();
     }
 }
 //切り替え
 if ($action === "toggle") {
-    if (isset($_POST["product_id"])) {
-        try {
-            $pdo->beginTransaction();
-            $message = togglePublic();
-            if (empty($error_message)) {
-                $pdo->commit();
-            }
-        } catch (Exception $e) {
-            $error_message[] = 'データベースエラー：' . $e->getMessage();
-            $pdo->rollBack();
-        }
+    $error_message = togglePublicManage($error_message);
+    if (empty($error_message)) {
+        $message[] = "商品の公開ステータスを切り替えました";
     }
 }
 
 //削除
 if ($action === "delete") {
-    if (isset($_POST["product_id"])) {
-        try {
-            $pdo->beginTransaction();
-            $message = deleteProduct($message);
-            if (isset($message) && empty($error_message)) {
-                $pdo->commit();
-            }
-        } catch (Exception $e) {
-            $error_message[] = 'データベースエラー：' . $e->getMessage();
-            $pdo->rollBack();
-        }
+    $error_message = deleteProductManage($error_message);
+    if (empty($error_message)) {
+        $message[] = "商品を削除しました";
     }
 }
 
 //数量変更
 if ($action === "update_qty") {
     if (isset($_POST["product_id"]) && isset($_POST["stock_qty"]) && $_POST["stock_qty"] >= 0) {
-        try {
-            $pdo->beginTransaction();
-            $error_message = updateQty($error_message);
-            if (empty($error_message)) {
-                $pdo->commit();
-                $message[] = "在庫数を変更しました";
-            }
-        } catch (Exception $e) {
-            $error_message[] = 'データベースエラー：' . $e->getMessage();
-            $pdo->rollBack();
-        }
-    } else {
-        $error_message[] = "数量を0以上の整数で指定してください";
+        $error_message = updateQty($error_message);
+    }
+    if (empty($error_message)) {
+        $message[] = "数量の変更に成功しました";
     }
 }
 
 $display_error_message = convertToArray($error_message) ?? [];
 $display_message = convertToArray($message) ?? [];
-$product_data = getProducts() ?? [];
+$product_data = getProducts() ?? "";
 $array_product_data = convertToArray($product_data) ?? [];
 $product_view_data = h_array($array_product_data) ?? [];
 

@@ -8,27 +8,7 @@ function adminCheck()
     }
 }
 
-//フォームの情報が残っていたら復元
-/* function restoreForm()
-{
-    $form = [];
-    if (isset($_POST["form"])) {
-        $form = $_POST["form"];
-    } else {
-        $form = [
-            "product_name" => "",
-            "price" => "",
-            "stock_qty" => "",
-            "image_name" => "",
-            "public_flg" => "",
-            "create_date" => "",
-            "product_id" => "",
-        ];
-    }
-    return $form;
-} */
-
-//バリデーション
+//商品登録のバリデーション
 function validationAddProduct($pdo, $message)
 {
     $message = [];
@@ -64,8 +44,8 @@ function validationAddProduct($pdo, $message)
 }
 
 
-
-function addProduct($pdo, $error_message)
+//商品を登録
+function addProductToDatabase($pdo, $error_message)
 {
     $product_name = $_POST["product_name"];
     $price = $_POST["price"];
@@ -95,16 +75,16 @@ function addProduct($pdo, $error_message)
         ":public_flg" => $public_flg,
         ":create_date" => currentDate()
     ];
-    if (insertProduct($pdo, $product_data)) {
+    if (insertProduct($product_data)) {
         $product_data[":product_id"] = $pdo->lastInsertId();
-        if (!insertImage($pdo, $product_data) || !insertStock($pdo, $product_data)) {
+        if (!insertImage($product_data) || !insertStock($product_data)) {
             return $error_message[] = "データベースに登録出来ませんでした";
         }
     }
 }
 
-//商品登録
-function insertProduct($pdo, $form)
+//商品登録クエリ
+function insertProduct($form)
 {
     try {
         $sql = "INSERT INTO ec_product_table (product_name, price, public_flg, create_date) VALUES (:product_name, :price, :public_flg, :create_date)";
@@ -121,8 +101,8 @@ function insertProduct($pdo, $form)
     }
 }
 
-//画像登録
-function insertImage($pdo, $form)
+//画像登録クエリ
+function insertImage($form)
 {
     try {
         $sql = "INSERT INTO ec_image_table (product_id, image_name, create_date) VALUES (:product_id,:image_name,:create_date)";
@@ -138,8 +118,8 @@ function insertImage($pdo, $form)
     }
 }
 
-//在庫数登録
-function insertStock($pdo, $form)
+//在庫数登録クエリ
+function insertStock($form)
 {
     try {
         $sql = "INSERT INTO ec_stock_table (product_id, stock_qty,create_date) VALUES(:product_id, :stock_qty, :create_date)";
@@ -155,7 +135,31 @@ function insertStock($pdo, $form)
     }
 }
 
-//商品の公開・非公開を切り替える
+//商品登録処理
+function addProductManage($error_message)
+{
+    try {
+        $pdo = getConnection();
+        $pdo->beginTransaction();
+        $error_message = validationAddProduct($pdo, $error_message);
+        if (empty($error_message)) {
+            $error_message = addProductToDatabase($pdo, $error_message);
+            if (empty($error_message)) {
+                $pdo->commit();
+            } else {
+                $pdo->rollBack();
+            }
+        }
+    } catch (PDOException $e) {
+        $error_message[] = 'データベースエラー：' . $e->getMessage();
+        $pdo->rollBack();
+        return $error_message;
+    }
+}
+
+
+
+//商品の公開ステータスを切り替えるクエリ
 function togglePublic()
 {
     $date = currentDate();
@@ -171,39 +175,59 @@ function togglePublic()
         ":update_date" => $date,
         ":product_id" => $product_id
     ];
-    $row = sql_fetch_data($sql, $param);
-    if ($row) {
-        $message[] = "商品の公開ステータスを切り替えました";
-        return $message;
+    $result = sql_fetch_data($sql, $param);
+    return $result;
+}
+
+//商品の公開ステータス切り替え処理
+function togglePublicManage($error_message)
+{
+    try {
+        $pdo = getConnection();
+        $pdo->beginTransaction();
+        $result = togglePublic();
+        if ($result) {
+            $pdo->commit();
+        }
+    } catch (Exception $e) {
+        $error_message[] = 'データベースエラー：' . $e->getMessage();
+        $pdo->rollBack();
+        return $error_message;
     }
 }
 
-//商品を選んでDBから削除する
-function deleteProduct($message)
+
+
+//商品を削除するクエリ
+function deleteProductManage($error_message)
 {
     try {
+        $pdo = getConnection();
+        $pdo->beginTransaction();
         $select_sql = "SELECT i.image_name FROM ec_image_table i INNER JOIN ec_product_table p ON i.product_id = p.product_id  WHERE i.product_id = :product_id";
         $product_id = $_POST["product_id"];
         $param = [":product_id" => $product_id];
         $get_image_name = sql_fetch_data($select_sql, $param, true);
         $image_name = $get_image_name["image_name"];
         $delete_sql = "DELETE FROM ec_product_table WHERE product_id = :product_id";
-        $delete = sql_fetch_data($delete_sql, $param);
-        if ($delete) {
+        $result = sql_fetch_data($delete_sql, $param);
+        if ($result && empty($error_message)) {
             unlink(IMG_DIR . $image_name);
-            $message[] = "データベースから商品を削除しました";
-            return $message;
+            $pdo->commit();
         }
-    } catch (PDOException $e) {
-        throw $e;
+    } catch (Exception $e) {
+        $error_message[] = 'データベースエラー：' . $e->getMessage();
+        $pdo->rollBack();
+        return $error_message;
     }
 }
 
-
-//商品を選んで在庫数を変更する
+//在庫数を変更する処理
 function updateQty($error_message)
 {
     try {
+        $pdo = getConnection();
+        $pdo->beginTransaction();
         $sql = "UPDATE ec_stock_table SET stock_qty =:stock_qty WHERE product_id =:product_id";
         $product_id = $_POST["product_id"];
         $stock_qty = $_POST["stock_qty"];
@@ -216,11 +240,12 @@ function updateQty($error_message)
             $error_message[] = "在庫数が変更されませんでした";
             return $error_message;
         }
+        $pdo->commit();
     } catch (PDOException $e) {
-        throw $e;
+        $error_message[] = 'データベースエラー：' . $e->getMessage();
+        $pdo->rollBack();
     }
 }
-
 
 //管理する商品をリスト化
 function getProducts()

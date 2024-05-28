@@ -1,4 +1,20 @@
 <?php
+//認証確認
+function authenticateUser()
+{
+    try {
+        $check_user = checkUser();
+        $password = $_POST["password"];
+        if ($check_user && password_verify($password, $check_user["password"])) {
+            return $check_user;
+        } else {
+            return "ユーザー名またはパスワードが一致しません";
+        }
+    } catch (PDOException $e) {
+        return 'データベースエラー：' . $e->getMessage();
+    }
+}
+
 //文字の長さ確認
 function validationLength($input, $type)
 {
@@ -47,10 +63,11 @@ function checkUser()
     return duplicateCheck($sql, $user_param);
 }
 
-function createUser($user_name, $password)
+function createUser()
 {
     try {
-        $pdo = getConnection();
+        $user_name = $_POST["user_name"];
+        $password = $_POST["password"];
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         $sql = "INSERT INTO ec_user_table(user_name, password, create_date) VALUES(:user_name, :password, :create_date)";
         $params = [
@@ -60,14 +77,35 @@ function createUser($user_name, $password)
         ];
         $result = sql_fetch_data($sql, $params);
         if ($result) {
-            $pdo->commit();
             return $result;
         } else {
-            $pdo->rollBack();
             return false;
         }
     } catch (PDOException $e) {
-        $pdo->rollBack();
         throw $e;
+    }
+}
+
+function register($password)
+{
+    try {
+        $pdo = getConnection();
+        $pdo->beginTransaction();
+        $user_name = $_POST["user_name"];
+        if (checkUser()) {
+            $pdo->rollBack();
+            return "そのユーザー名は既に使用されています";
+        }
+        $result = createUser();
+        if ($result) {
+            $pdo->commit();
+            return true;
+        } else {
+            $pdo->rollBack();
+            return "ユーザー登録に失敗しました";
+        }
+    } catch (PDOException $e) {
+        $pdo->rollBack();
+        return "データベースエラー：" . $e->getMessage();
     }
 }

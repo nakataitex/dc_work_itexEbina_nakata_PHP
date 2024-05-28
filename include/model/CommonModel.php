@@ -21,7 +21,7 @@ function loginCheck()
 {
     if (isset($_SESSION["login"])) {
         if ($_SESSION["user_name"] !== "ec_admin") {
-            header("Location: ./Shopping.php");
+            header("Location: ./Catalog.php");
             exit();
         } elseif ($_SESSION["user_name"] === "ec_admin") {
             header("Location: ./Manage.php");
@@ -78,7 +78,7 @@ function displayMessage($messages)
 //DBから受け取った結果が単一だった場合配列化して他の関数で流用出来るようにする
 function convertToArray($data)
 {
-    if (isset($data["product_name"])) {
+    if (isset($data["product_name"]) || isset($data["product_id"])) {
         $data = [$data];
     }
     return $data;

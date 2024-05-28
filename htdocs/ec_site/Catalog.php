@@ -17,19 +17,9 @@ $action = $_POST["action"] ?? "";
 
 //カートに追加
 if ($action === "add") {
-    try {
-        $pdo = getConnection();
-        $pdo->beginTransaction();
-        $error_message = addCart($error_message);
-        if (empty($error_message)) {
-            $pdo->commit();
-            $message[] = "商品をカートに追加しました";
-        } else {
-            $pdo->rollBack();
-        }
-    } catch (PDOException $e) {
-        $error_message[] = $e->getMessage();
-        $pdo->rollBack();
+    $error_message = addCart($error_message);
+    if (empty($error_message)) {
+        $message = "カートに追加しました";
     }
 }
 

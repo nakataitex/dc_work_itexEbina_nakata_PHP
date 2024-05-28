@@ -18,6 +18,8 @@ function checkCartQty()
 function addCart($error_message)
 {
     try {
+        $pdo = getConnection();
+        $pdo->beginTransaction();
         $user_id = $_SESSION["user_id"];
         $product_id = $_POST["product_id"];
         if (!isset($_POST["product_qty"]) || (int) $_POST["product_qty"] <= 0) {
@@ -48,14 +50,23 @@ function addCart($error_message)
                 ];
             }
             sql_fetch_data($sql, $param, true);
+            if (empty($error_message)) {
+                $pdo->commit();
+            } else {
+                $pdo->rollBack();
+                return $error_message;
+            }
         } else {
             $error_message[] = "1以上の整数を指定してください";
+            $pdo->rollBack();
             return $error_message;
         }
     } catch (Exception $e) {
-        throw $e;
+        $error_message[] = 'データベースエラー：' . $e->getMessage();
+        $pdo->rollBack();
     }
 }
+
 
 
 //商品リストを表示

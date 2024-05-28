@@ -14,68 +14,50 @@ $message = [];
 $error_message = [];
 $pdo = getConnection();
 $action = $_POST["action"] ?? "";
+$cart_data = getCart() ?? "";
 
-/* //注文
- if ($action === "buy") {
+//注文
+if ($action === "buy") {
     try {
-        $pdo->beginTransaction();
-        $error_message = validationAddProduct($pdo, $error_message);
-        if (empty($error_message)) {
-            $error_message = addProduct($pdo, $error_message);
-            if (empty($error_message)) {
-                $pdo->commit();
-                $message[] = "商品を購入しました";
-            } else {
-                $pdo->rollBack();
-            }
+        $order_id = order($cart_data, $error_message);
+        if ($order_id) {
+            $_SESSION["order_id"] = $order_id;
+            header("Location: ./Purchase.php");
+            exit();
         }
-    } catch (PDOException $e) {
+    } catch (Exception $e) {
         $error_message[] = $e->getMessage();
-        $pdo->rollBack();
     }
-} */
-
+}
 //削除
 if ($action === "delete") {
     if (isset($_POST["product_id"])) {
-        try {
-            $pdo->beginTransaction();
-            $message = deleteFromCart($message);
-            if (isset($message) && empty($error_message)) {
-                $pdo->commit();
-            }
-        } catch (Exception $e) {
-            $error_message[] = 'データベースエラー：' . $e->getMessage();
-            $pdo->rollBack();
+        $error_message = deleteFromCart($error_message);
+        if (empty($error_message)) {
+            $message[] = "カートから削除しました";
         }
     }
 }
-
 //数量変更
 if ($action === "update_qty") {
-    if (isset($_POST["product_id"]) && isset($_POST["product_qty"]) && $_POST["product_qty"] >= 0) {
-        try {
-            $pdo->beginTransaction();
-            $error_message = updateCartQty($error_message);
-            if (empty($error_message)) {
-                $pdo->commit();
-                $message[] = "個数を変更しました";
-            }
-        } catch (Exception $e) {
-            $error_message[] = 'データベースエラー：' . $e->getMessage();
-            $pdo->rollBack();
+    if (isset($_POST["product_id"]) && isset($_POST["product_qty"]) && (int) $_POST["product_qty"] > 0) {
+        $error_message = updateQtyFromCart($error_message);
+        if (empty($error_message)) {
+            $message[] = "個数を変更しました";
         }
     } else {
         $error_message[] = "数量は1以上の整数を指定してください";
     }
-} 
+}
 
 $display_error_message = convertToArray($error_message) ?? [];
 $display_message = convertToArray($message) ?? [];
-$cart_data = getCart() ?? [];
+$cart_data = getCart() ?? "";
 $array_cart_data = convertToArray($cart_data) ?? [];
 $cart_view_data = h_array($array_cart_data) ?? [];
-
+if (empty($cart_data)) {
+    $error_message[] = "カートに何も入っていません";
+}
 
 //CSSファイルの選択
 $stylesheet = "./assets/Style.css";
@@ -91,4 +73,3 @@ $menus = [
 include_once "../../include/view/HeaderView.php";
 include_once "../../include/view/CartView.php";
 include_once "../../include/view/FooterView.php";
-echo $cart_view_data[1]["product_name"];

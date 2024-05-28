@@ -17,27 +17,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } else {
         $user_name = $_POST["user_name"];
         $password = $_POST["password"];
-        try {
-            $pdo = getConnection();
-            $pdo->beginTransaction();
-            if (checkUser()) {
-                $error_message[] = "そのユーザー名は既に使われています";
+        $error_message = validationUserForm($error_message);
+        if (empty($error_message)) {
+            $result = register($password);
+            if ($result === true) {
+                $_SESSION["success"] = true;
+                header("Location: ./RegisterSuccess.php");
+                exit();
             } else {
-                $error_message = validationUserForm($error_message);
+                $error_message[] = $result; // エラーメッセージを追加
             }
-            if (empty($error_message)) {
-                
-                $result = createUser($user_name, $password);
-                if ($result !== false) {
-                    $_SESSION["success"] = true;
-                    header("Location: ./RegisterSuccess.php");
-                    exit();
-                } else {
-                    $error_message = "ユーザー登録に失敗しました";
-                }
-            }
-        } catch (PDOException $e) {
-            $error_message[] = 'データベースエラー：' . $e->getMessage();
         }
     }
 }
