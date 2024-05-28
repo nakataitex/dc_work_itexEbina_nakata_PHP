@@ -2,8 +2,8 @@
 //定数(const.php)を読み込む
 require_once '../../include/config/const.php';
 //modelファイル読み込み
-require_once "../../include/model/CommonModel.php";
-require_once "../../include/model/UserModel.php";
+require_once "../../include/model/common_model.php";
+require_once "../../include/model/user_model.php";
 
 session_start();
 loginCheck();
@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $result = register($password);
             if ($result === true) {
                 $_SESSION["success"] = true;
-                header("Location: ./RegisterSuccess.php");
+                header("Location: ./register_success.php");
                 exit();
             } else {
                 $error_message[] = $result; // エラーメッセージを追加
@@ -35,17 +35,17 @@ $display_error_message = convertToArray($error_message) ?? "";
 $display_message = convertToArray($message) ?? "";
 
 //CSSファイルの選択
-$stylesheet = "./assets/Style.css";
+$stylesheet = CSS_DIR;
 //ページタイトル
 $page_title = "会員登録";
 //CSSファイルの選択
 $menus = [
-    "./Login.php" => "ログイン"
+    "./login.php" => "ログイン"
 ];
 
 //ログイン画面のヘッダーまでを読み込む
-include_once ("../../include/view/HeaderView.php");
+include_once ("../../include/view/header_view.php");
 //会員登録画面を読み込む
-include_once "../../include/view/RegisterView.php";
+include_once "../../include/view/register_view.php";
 //ログイン画面のフッターを読み込む
-include_once ('../../include/view/FooterView.php');
+include_once ('../../include/view/footer_view.php');

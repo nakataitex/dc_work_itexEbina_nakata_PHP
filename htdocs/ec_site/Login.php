@@ -2,8 +2,8 @@
 //constファイル読み込み
 require_once "../../include/config/const.php";
 //modelファイル読み込み
-require_once "../../include/model/CommonModel.php";
-require_once "../../include/model/UserModel.php";
+require_once "../../include/model/common_model.php";
+require_once "../../include/model/user_model.php";
 
 session_start();
 loginCheck();
@@ -24,10 +24,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $_SESSION["user_id"] = $result["user_id"];
             $_SESSION["user_name"] = $result["user_name"];
             if ($_SESSION["login"] && isset($_SESSION["user_name"]) && $_SESSION["user_name"] === "ec_admin") {
-                header("Location: ./Manage.php");
+                header("Location: ./manage.php");
                 exit();
             } else {
-                header("Location: ./Catalog.php");
+                header("Location: ./catalog.php");
                 exit();
             }
         } else {
@@ -40,15 +40,15 @@ $display_error_message = convertToArray($error_message) ?? "";
 $display_message = convertToArray($message) ?? "";
 
 //CSSファイルの選択
-$stylesheet = "./assets/Style.css";
+$stylesheet = CSS_DIR;
 //ページタイトル
 $page_title = "ログイン画面";
 //ページリンク
 $menus = [
-    "./Register.php" => "会員登録"
+    "./register.php" => "会員登録"
 ];
 
 //viewファイル読み込み
-include_once "../../include/view/HeaderView.php";
-include_once "../../include/view/LoginView.php";
-include_once "../../include/view/FooterView.php";
+include_once "../../include/view/header_view.php";
+include_once "../../include/view/login_view.php";
+include_once "../../include/view/footer_view.php";

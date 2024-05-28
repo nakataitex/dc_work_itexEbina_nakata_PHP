@@ -23,9 +23,14 @@
 
     <body>
         <div class="contents">
-            <div class="error">
-                <?php displayMessage($display_error_message) ?? ""; ?>
-            </div>
-            <div class="normal">
-                <?php displayMessage($display_message) ?? ""; ?>
-            </div>
+            <?php
+            if (!empty($error_message) || !empty($message)): ?>
+                <div class="message_area">
+                    <div class="error_message">
+                        <?php displayMessage($display_error_message) ?? ""; ?>
+                    </div>
+                    <div class="normal_message">
+                        <?php displayMessage($display_message) ?? ""; ?>
+                    </div>
+                </div>
+            <?php endif; ?>

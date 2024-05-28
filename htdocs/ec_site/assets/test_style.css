@@ -1,0 +1,116 @@
+header {
+    position: fixed;
+    margin: 0 auto;
+    padding: 30px;
+    top: 0;
+    left: 0;
+    max-width: 10%;
+    height: 100%;
+    line-height: 26px;
+    background-color: #000000CB;
+    color: white;
+}
+
+.title {
+    font-size: 26px;
+    color: #32a1ce;
+}
+
+.header_menu li a {
+    text-decoration: none;
+    color: rgb(159, 255, 223);
+}
+
+
+main,footer {
+    margin-left: 10%;
+    padding: 0;
+}
+
+.message_area {
+    border: solid #000000CB 1px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    width: 400px;
+    padding: 10px;
+}
+
+.error_message,.normal_message {
+    font-weight: bold;
+    text-align: center;
+}
+.error_message {
+    color: #ff00008f;
+}
+
+.contents, footer {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form_container{
+    display: block;
+    text-align:center;
+}
+
+/* テーブル全体のスタイル */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 18px;
+    text-align: left;
+}
+
+/* ヘッダーのスタイル */
+th, td {
+    padding: 12px;
+    border: 1px solid #ddd;
+}
+
+/* ヘッダーの背景色と文字の色 */
+th {
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* 交互の行に背景色を付ける */
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* 画像のスタイル */
+td img {
+    width: 100px;
+    height: auto;
+}
+
+/* フォームのボタンのスタイル */
+input[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+/* 数量入力フィールドのスタイル */
+input[type="number"] {
+    width: 50px;
+    padding: 5px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+footer p{
+    text-align: center;
+    
+}

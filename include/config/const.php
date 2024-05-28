@@ -6,3 +6,6 @@ define('LOGIN_PASSWORD', 'mj3mt8vtwv');
 
 //商品画像の保存先
 define('IMG_DIR', './assets/img/');
+
+//CSSファイルのディレクトリ
+define('CSS_DIR','./assets/ec_site_style.css');

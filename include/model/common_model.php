@@ -21,10 +21,10 @@ function loginCheck()
 {
     if (isset($_SESSION["login"])) {
         if ($_SESSION["user_name"] !== "ec_admin") {
-            header("Location: ./Catalog.php");
+            header("Location: ./catalog.php");
             exit();
         } elseif ($_SESSION["user_name"] === "ec_admin") {
-            header("Location: ./Manage.php");
+            header("Location: ./manage.php");
             exit();
         }
     }
@@ -34,7 +34,7 @@ function loginCheck()
 function commonUserCheck()
 {
     if (!isset($_SESSION["login"]) || !isset($_SESSION["user_name"]) || $_SESSION["user_name"] === "ec_admin") {
-        header("Location: ./Login.php");
+        header("Location: ./login.php");
         exit();
     }
 }

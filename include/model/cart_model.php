@@ -186,7 +186,6 @@ function updateCartQty()
 {
     try {
         $product_qty = (int) $_POST["product_qty"] ?? 0;
-        var_dump($product_qty);
         if ($product_qty > 0) {
             $sql = "UPDATE ec_cart_table SET product_qty = :product_qty, update_date = :update_date WHERE user_id = :user_id AND product_id = :product_id";
             $product_qty = $_POST["product_qty"];

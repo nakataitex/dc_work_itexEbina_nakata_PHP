@@ -1,0 +1,1 @@
+<p><a href="./login.php">ログインする</a></p>

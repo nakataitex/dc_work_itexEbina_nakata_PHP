@@ -2,9 +2,9 @@
 //定数(const.php)を読み込む
 require_once '../../include/config/const.php';
 //Model(ec_model.php)を読み込む
-require_once '../../include/model/CommonModel.php';
+require_once '../../include/model/common_model.php';
 //Model(ec_product_model.php)を読み込む
-require_once '../../include/model/ManageModel.php';
+require_once '../../include/model/manage_model.php';
 
 session_start();
 adminCheck();
@@ -62,15 +62,15 @@ $product_view_data = h_array($array_product_data) ?? [];
 
 
 //CSSファイルの選択
-$stylesheet = "./assets/Style.css";
+$stylesheet = CSS_DIR;
 //ページタイトル
 $page_title = "商品管理";
 //ページリンク
 $menus = [
-    "./Logout.php" => "ログアウト"
+    "./logout.php" => "ログアウト"
 ];
 
 //Viewファイルを読み込む
-include_once "../../include/view/HeaderView.php";
-include_once "../../include/view/ManageView.php";
-include_once "../../include/view/FooterView.php";
+include_once "../../include/view/header_view.php";
+include_once "../../include/view/manage_view.php";
+include_once "../../include/view/footer_view.php";

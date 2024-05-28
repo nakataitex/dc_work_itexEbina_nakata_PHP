@@ -3,7 +3,7 @@
 function adminCheck()
 {
     if (!isset($_SESSION["login"]) || !isset($_SESSION["user_name"]) || $_SESSION["user_name"] !== "ec_admin") {
-        header("Location: ./Login.php");
+        header("Location: ./login.php");
         exit();
     }
 }
@@ -11,21 +11,22 @@ function adminCheck()
 //商品登録のバリデーション
 function validationAddProduct($pdo, $message)
 {
-    $message = [];
+    $message = $message ?? [];
     $product_name = $_POST["product_name"];
-    $price = $_POST["price"];
-    $stock_qty = $_POST["stock_qty"];
-    $public_flg = $_POST["public_flg"];
+    $price = (int) $_POST["price"];
+    $stock_qty = (int) $_POST["stock_qty"];
+    $public_flg = (int) $_POST["public_flg"];
     $temp_file = $_FILES["image"]["tmp_name"];
     $duplicate_check_sql = "SELECT count(*) count from ec_product_table where product_name = :product_name";
     $stmt = $pdo->prepare($duplicate_check_sql);
     $stmt->bindValue(":product_name", $product_name);
     $stmt->execute();
     $count = $stmt->fetchColumn();
+    $count_int = (int) $count;
     if (!isset($product_name)) {
         $message[] = "商品名を入力してください";
     }
-    if ($count > 0) {
+    if ($count_int > 0) {
         $message[] = "既に登録された商品です";
     }
     if (!isset($price) || !is_numeric($price) || $price < 0) {
@@ -47,6 +48,9 @@ function validationAddProduct($pdo, $message)
 //商品を登録
 function addProductToDatabase($pdo, $error_message)
 {
+    var_dump($error_message);
+    $error_message = $error_message ?? [];
+    
     $product_name = $_POST["product_name"];
     $price = $_POST["price"];
     $stock_qty = $_POST["stock_qty"];
@@ -141,13 +145,15 @@ function addProductManage($error_message)
     try {
         $pdo = getConnection();
         $pdo->beginTransaction();
-        $error_message = validationAddProduct($pdo, $error_message);
+        $error_message[] = validationAddProduct($pdo, $error_message);
         if (empty($error_message)) {
-            $error_message = addProductToDatabase($pdo, $error_message);
+            $error_message[] = addProductToDatabase($pdo, $error_message);
             if (empty($error_message)) {
                 $pdo->commit();
             } else {
                 $pdo->rollBack();
+                $error_message[] = "商品の追加に失敗しました";
+                return $error_message;
             }
         }
     } catch (PDOException $e) {

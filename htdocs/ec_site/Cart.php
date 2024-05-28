@@ -2,9 +2,9 @@
 //定数(const.php)を読み込む
 require_once '../../include/config/const.php';
 //Model(ec_model.php)を読み込む
-require_once '../../include/model/CommonModel.php';
-//Model(ec_product_model.php)を読み込む
-require_once '../../include/model/CartModel.php';
+require_once '../../include/model/common_model.php';
+//Model(ec_product_model.php)を読み込sむ
+require_once '../../include/model/cart_model.php';
 
 session_start();
 commonUserCheck();
@@ -22,7 +22,7 @@ if ($action === "buy") {
         $order_id = order($cart_data, $error_message);
         if ($order_id) {
             $_SESSION["order_id"] = $order_id;
-            header("Location: ./Purchase.php");
+            header("Location: ./purchase.php");
             exit();
         }
     } catch (Exception $e) {
@@ -60,16 +60,16 @@ if (empty($cart_data)) {
 }
 
 //CSSファイルの選択
-$stylesheet = "./assets/Style.css";
+$stylesheet = CSS_DIR;
 //ページタイトル
 $page_title = "カート";
 //ページリンク
 $menus = [
-    "./Catalog.php" => "商品一覧",
-    "./Logout.php" => "ログアウト"
+    "./catalog.php" => "商品一覧",
+    "./logout.php" => "ログアウト"
 ];
 
 //Viewファイルを読み込む
-include_once "../../include/view/HeaderView.php";
-include_once "../../include/view/CartView.php";
-include_once "../../include/view/FooterView.php";
+include_once "../../include/view/header_view.php";
+include_once "../../include/view/cart_view.php";
+include_once "../../include/view/footer_view.php";

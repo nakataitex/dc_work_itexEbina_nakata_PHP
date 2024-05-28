@@ -2,9 +2,9 @@
 //定数(const.php)を読み込む
 require_once '../../include/config/const.php';
 //Model(ec_model.php)を読み込む
-require_once '../../include/model/CommonModel.php';
+require_once '../../include/model/common_model.php';
 //Model(ec_product_model.php)を読み込む
-require_once '../../include/model/CatalogModel.php';
+require_once '../../include/model/catalog_model.php';
 
 session_start();
 commonUserCheck();
@@ -30,16 +30,16 @@ $array_catalog_data = convertToArray($catalog_data) ?? "";
 $catalog_view_data = h_array($array_catalog_data) ?? "";
 
 //CSSファイルの選択
-$stylesheet = "./assets/Style.css";
+$stylesheet = CSS_DIR;
 //ページタイトル
 $page_title = "商品一覧";
 //ページリンク
 $menus = [
-    "./Cart.php" => "カート",
-    "./Logout.php" => "ログアウト"
+    "./cart.php" => "カート",
+    "./ogout.php" => "ログアウト"
 ];
 
 //Viewファイルを読み込む
-include_once "../../include/view/HeaderView.php";
-include_once "../../include/view/CatalogView.php";
-include_once "../../include/view/FooterView.php";
+include_once "../../include/view/header_view.php";
+include_once "../../include/view/catalog_view.php";
+include_once "../../include/view/footer_view.php";
