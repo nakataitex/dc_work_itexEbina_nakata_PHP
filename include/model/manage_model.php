@@ -200,7 +200,6 @@ function deleteProductManage($pdo)
         $image_name = $get_image_name["image_name"];
         $delete_sql = "DELETE FROM ec_product_table WHERE product_id = :product_id";
         $result = sqlFetchData($delete_sql, $param);
-        var_dump($result);
         if ($result) {
             unlink(IMG_DIR . $image_name);
             $pdo->commit();

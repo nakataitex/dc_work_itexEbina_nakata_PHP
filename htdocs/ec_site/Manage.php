@@ -17,7 +17,7 @@ $image = isset($_POST["image"]) ? $_POST["image"] : "";
 $action = $_POST["action"] ?? "";
 
 //追加
-if ($_SERVER("REQUEST_METHOD") === "POST") {
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($action === "add") {
         try {
             validationAddProduct($pdo);
