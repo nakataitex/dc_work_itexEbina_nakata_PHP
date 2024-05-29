@@ -4,10 +4,12 @@ session_start();
 $params = [//ログアウトしたセッション情報
     "login",
     "user_id",
-    "user_name"
+    "user_name",
+    "order_id",
+    "success"
 ];
 
-//まとめてunsetする
+//セッション情報をまとめてunsetする
 foreach ($params as $param) {
     if ($_SESSION[$param]) {
         unset($_SESSION[$param]);

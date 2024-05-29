@@ -39,7 +39,6 @@ function commonUserCheck()
     }
 }
 
-
 //タイムゾーンAsia/Tokyoの日付を取得
 function currentDate()
 {
@@ -84,26 +83,14 @@ function convertToArray($data)
     return $data;
 }
 
-/**
- * htmlspecialchars(特殊文字の変換)のラッパー関数
- *繰り返し使用するので、引数指定の繰り返しなど省略できるようにする
- *
- *@param string
- *@return string  
- */
+//htmlspecialchars(特殊文字の変換)のラッパー関数
 function h($str)
 {
     return htmlspecialchars($str, ENT_QUOTES, "UTF-8");
 }
 
-/**
- *特殊文字の変換(二次元配列対応)
- *二次元配列で上のh()を使える様にするもの
- *
- *@param array
- *@return array
- */
-function h_array($array)
+//二次元配列で上のh()を使える様にする関数
+function hArray($array)
 {
     //二次元配列をforeachでループさせる
     foreach ($array as $keys => $values) {
@@ -116,7 +103,7 @@ function h_array($array)
 }
 
 //SQLを実行
-function sql_fetch_data($sql, $params = [], $singleRow = false)
+function sqlFetchData($sql, $params = [], $singleRow = false)
 {
     try {
         $pdo = getConnection();

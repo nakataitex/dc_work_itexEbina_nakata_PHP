@@ -1,9 +1,8 @@
 <?php
-//定数(const.php)を読み込む
+//定数を読み込む
 require_once '../../include/config/const.php';
-//Model(ec_model.php)を読み込む
+//Modelを読み込む
 require_once '../../include/model/common_model.php';
-//Model(ec_product_model.php)を読み込sむ
 require_once '../../include/model/cart_model.php';
 
 session_start();
@@ -13,50 +12,62 @@ $product_data = [];//商品データ
 $message = [];
 $error_message = [];
 $pdo = getConnection();
-$action = $_POST["action"] ?? "";
-$cart_data = getCart() ?? "";
-
-//注文
-if ($action === "buy") {
+//カート内のデータを取得
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $action = $_POST["action"] ?? "";
     try {
-        $order_id = order($cart_data, $error_message);
-        if ($order_id) {
-            $_SESSION["order_id"] = $order_id;
-            header("Location: ./purchase.php");
-            exit();
-        }
+        $cart_data = getCart() ?? "";
     } catch (Exception $e) {
         $error_message[] = $e->getMessage();
     }
-}
-//削除
-if ($action === "delete") {
-    if (isset($_POST["product_id"])) {
-        $error_message = deleteFromCart($error_message);
-        if (empty($error_message)) {
-            $message[] = "カートから削除しました";
+
+    //注文
+    if ($action === "buy") {
+        try {
+            $order_id = order($cart_data, $pdo);
+            if ($order_id) {
+                $_SESSION["order_id"] = $order_id;
+                header("Location: ./purchase.php");
+                exit();
+            }
+        } catch (Exception $e) {
+            $error_message[] = $e->getMessage();
         }
     }
-}
-//数量変更
-if ($action === "update_qty") {
-    if (isset($_POST["product_id"]) && isset($_POST["product_qty"]) && (int) $_POST["product_qty"] > 0) {
-        $error_message = updateQtyFromCart($error_message);
-        if (empty($error_message)) {
-            $message[] = "個数を変更しました";
+
+    //削除
+    if ($action === "delete") {
+        try {
+            $message = deleteFromCart($pdo);
+        } catch (Exception $e) {
+            $error_message[] = $e->getMessage();
         }
-    } else {
-        $error_message[] = "数量は1以上の整数を指定してください";
+    }
+
+    //数量変更
+    if ($action === "update_qty") {
+        try {
+            $message = updateQtyFromCart($pdo);
+        } catch (Exception $e) {
+            $error_message[] = $e->getMessage();
+        }
     }
 }
 
+//viewで表示するデータ
 $display_error_message = convertToArray($error_message) ?? [];
 $display_message = convertToArray($message) ?? [];
-$cart_data = getCart() ?? "";
-$array_cart_data = convertToArray($cart_data) ?? [];
-$cart_view_data = h_array($array_cart_data) ?? [];
-if (empty($cart_data)) {
-    $error_message[] = "カートに何も入っていません";
+
+//最新のカート内のデータを取得
+try {
+    $cart_data = getCart() ?? "";
+} catch (Exception $e) {
+    $error_message[] = $e->getMessage();
+}
+if (isset($cart_data)) {
+    $total_amount = getTotalAmount($cart_data);
+    $array_cart_data = convertToArray($cart_data) ?? [];
+    $cart_view_data = hArray($array_cart_data) ?? [];
 }
 
 //CSSファイルの選択

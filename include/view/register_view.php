@@ -1,4 +1,3 @@
-<h1>会員登録</h1>
 <p>登録に必要な事項をご記入ください。</p>
 <div class="form_container">
     <form action="" method="POST">

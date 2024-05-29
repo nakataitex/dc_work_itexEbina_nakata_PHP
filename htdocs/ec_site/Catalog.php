@@ -13,13 +13,16 @@ $product_data = [];//商品データ
 $message = [];
 $error_message = [];
 $pdo = getConnection();
-$action = $_POST["action"] ?? "";
 
 //カートに追加
-if ($action === "add") {
-    $error_message = addCart($error_message);
-    if (empty($error_message)) {
-        $message = "カートに追加しました";
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $action = $_POST["action"] ?? "";
+    if ($action === "add") {
+        try {
+            $message[] = addCart();
+        } catch (Exception $e) {
+            $error_message[] = $e->getMessage();
+        }
     }
 }
 
@@ -27,7 +30,7 @@ $display_error_message = convertToArray($error_message) ?? "";
 $display_message = convertToArray($message) ?? "";
 $catalog_data = getCatalog() ?? "";
 $array_catalog_data = convertToArray($catalog_data) ?? "";
-$catalog_view_data = h_array($array_catalog_data) ?? "";
+$catalog_view_data = hArray($array_catalog_data) ?? "";
 
 //CSSファイルの選択
 $stylesheet = CSS_DIR;
@@ -36,7 +39,7 @@ $page_title = "商品一覧";
 //ページリンク
 $menus = [
     "./cart.php" => "カート",
-    "./ogout.php" => "ログアウト"
+    "./logout.php" => "ログアウト"
 ];
 
 //Viewファイルを読み込む

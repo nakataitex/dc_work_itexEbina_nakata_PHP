@@ -5,5 +5,4 @@
     <p>EMAIL:example@mail.com</p>
 </footer>
 </body>
-
 </html>

@@ -10,12 +10,12 @@ function checkCartQty()
         ":user_id" => $user_id,
         ":product_id" => $product_id
     ];
-    $cart_qty = sql_fetch_data($check_cart_sql, $sql_param, true);
+    $cart_qty = sqlFetchData($check_cart_sql, $sql_param, true);
     return $cart_qty;
 }
 
 //カートに追加
-function addCart($error_message)
+function addCart()
 {
     try {
         $pdo = getConnection();
@@ -23,8 +23,7 @@ function addCart($error_message)
         $user_id = $_SESSION["user_id"];
         $product_id = $_POST["product_id"];
         if (!isset($_POST["product_qty"]) || (int) $_POST["product_qty"] <= 0) {
-            $error_message[] = "1以上の整数を入力してください";
-            return $error_message;
+            throw new Exception("1以上の整数を入力してください");
         }
         $add_qty = (int) $_POST["product_qty"];
         $cart_qty_check = checkCartQty();
@@ -49,25 +48,19 @@ function addCart($error_message)
                     ":product_id" => $product_id
                 ];
             }
-            sql_fetch_data($sql, $param, true);
-            if (empty($error_message)) {
-                $pdo->commit();
-            } else {
-                $pdo->rollBack();
-                return $error_message;
-            }
+            sqlFetchData($sql, $param, true);
+            $pdo->commit();
+            $message = "カートに追加しました";
+            return $message;
         } else {
-            $error_message[] = "1以上の整数を指定してください";
             $pdo->rollBack();
-            return $error_message;
+            throw new Exception("1以上の整数を指定してください");
         }
     } catch (Exception $e) {
-        $error_message[] = 'データベースエラー：' . $e->getMessage();
         $pdo->rollBack();
+        throw new Exception('データベースエラー：' . $e->getMessage());
     }
 }
-
-
 
 //商品リストを表示
 function getCatalog()
@@ -77,5 +70,5 @@ function getCatalog()
     ON s.product_id = i.product_id 
     JOIN ec_product_table p
     ON i.product_id = p.product_id WHERE p.public_flg = 1";
-    return sql_fetch_data($sql);
+    return sqlFetchData($sql);
 }

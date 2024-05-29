@@ -6,7 +6,10 @@ function getPrice($product_id)
     $param = [
         ":product_id" => $product_id
     ];
-    $product = sql_fetch_data($sql, $param, true);
+    $product = sqlFetchData($sql, $param, true);
+    if (empty($product)) {
+        throw new Exception("価格が取得出来ませんでした");
+    }
     return $product['price'];
 }
 
@@ -17,7 +20,10 @@ function getStockQty($product_id)
     $param = [
         ":product_id" => $product_id
     ];
-    $product = sql_fetch_data($sql, $param, true);
+    $product = sqlFetchData($sql, $param, true);
+    if (empty($product)) {
+        throw new Exception("在庫数が取得出来ませんでした");
+    }
     return $product['stock_qty'];
 }
 
@@ -29,10 +35,13 @@ function updateStock($product_id, $cart_qty)
         ":cart_qty" => $cart_qty,
         ":product_id" => $product_id
     ];
-    sql_fetch_data($sql, $param);
+    $result = sqlFetchData($sql, $param);
+    if (!$result) {
+        throw new Exception("在庫数の更新に失敗しました");
+    }
 }
 
-//カートから商品を削除
+//カートからすべての商品を削除する
 function allDeleteFromCart()
 {
     try {
@@ -41,92 +50,99 @@ function allDeleteFromCart()
         $param = [
             ":user_id" => $user_id
         ];
-        $delete = sql_fetch_data($delete_sql, $param);
+        $delete = sqlFetchData($delete_sql, $param);
         return $delete;
     } catch (PDOException $e) {
-        throw $e;
+        throw new Exception('エラー：' . $e->getMessage());
     }
 }
 
-//在庫数よりカートの商品数の方が多くないか確認して購入、購入したら
-function order($cart_data, $error_message)
+//在庫数よりカートの商品数の方が多くないか確認して購入
+function order($cart_data, $pdo)
 {
     try {
         $pdo = getConnection();
         $pdo->beginTransaction();
+        //注文id生成
         $user_id = $_SESSION["user_id"];
         $date = currentDate();
         $total_amount = 0;
-        //注文id生成
-        $insert_order_sql = "INSERT INTO ec_order_table (user_id, order_date, total_amount, create_date)VALUES(:user_id, :order_date, :total_amount, :create_date)";
+        $insert_order_sql = "INSERT INTO ec_order_table (user_id, order_date, total_amount, create_date)
+        VALUES(:user_id, :order_date, :total_amount, :create_date)";
         $insert_order_param = [
             ":user_id" => $user_id,
             ":order_date" => $date,
             ":total_amount" => $total_amount,
             ":create_date" => $date
         ];
-        sql_fetch_data($insert_order_sql, $insert_order_param);
+        sqlFetchData($insert_order_sql, $insert_order_param);
         $order_id = $pdo->lastInsertId();
-        //在庫と価格の確認
-        foreach ($cart_data as $product) {
-            $product_id = $product["product_id"];
-            $cart_qty = $product["product_qty"];
-            $price = getPrice($product_id);
-            if(empty($price)) {
-                $error_message[] ="価格が取得できませんでした";
-                throw new Exception($error_message);
-            }
-            $stock_qty = getStockQty($product_id);
-            if ($stock_qty < $cart_qty) {
-                $error_message[] = '在庫が足りません。商品名:' . $product["product_name"];
-                throw new Exception($error_message);
-            }
-            $insert_order_detail_sql = "INSERT INTO ec_order_details_table (order_id, product_id, product_qty, price, create_date) VALUES (:order_id, :product_id, :product_qty, :price, :create_date)";
-            $insert_order_detail_param = [
-                ":order_id" => $order_id,
-                ":product_id" => $product_id,
-                ":product_qty" => $cart_qty,
-                ":price" => $price,
-                ":create_date" => $date
-            ];
-            $order_detail =  sql_fetch_data($insert_order_detail_sql, $insert_order_detail_param);
-            if(!$order_detail){
-                $error_message[] = "注文詳細の作成に失敗しました";
-                throw new Exception($error_message);
-            }
-            //総額の計算
-            $total_amount += $price * $cart_qty;
-            //在庫数を更新
-            updateStock($product_id, $cart_qty);
-        }
+        $total_amount = insertOrderDetail($cart_data, $pdo, $date);
         //注文詳細を作成
-        $update_order_sql = "UPDATE ec_order_table SET total_amount = :total_amount, update_date = :update_date WHERE order_id = :order_id";
+        $update_order_sql = "UPDATE ec_order_table 
+        SET total_amount = :total_amount, update_date = :update_date
+        WHERE order_id = :order_id";
         $update_order_param = [
             "total_amount" => $total_amount,
             ":update_date" => $date,
             ":order_id" => $order_id
         ];
-        $buy = sql_fetch_data($update_order_sql, $update_order_param);
+        $buy = sqlFetchData($update_order_sql, $update_order_param);
         if ($buy) {
             allDeleteFromCart();
             $pdo->commit();
             return $order_id;
         } else {
             $pdo->rollBack();
-            $error_message[] = "購入の際にデータベースエラーが発生しました";
-            throw new Exception($error_message);
+            throw new Exception("購入の際にエラーが発生しました");
         }
     } catch (Exception $e) {
         $pdo->rollBack();
-        $error_message[] = 'エラーが発生しました：' . $e->getMessage();
-        throw new Exception($error_message);
+        throw new Exception($e->getMessage());
     }
 }
+
+//注文詳細を挿入
+function insertOrderDetail($cart_data, $pdo, $date)
+{
+    $order_id = $pdo->lastInsertId();
+    $date = currentDate();
+    //カート内の商品情報の取得
+    foreach ($cart_data as $product) {
+        $product_id = $product["product_id"];
+        $cart_qty = (int)$product["product_qty"];
+        $price = getPrice($product_id);
+        $stock_qty = (int)getStockQty($product_id);
+        //在庫が不足していないか確認
+        if ($stock_qty < $cart_qty) {
+            throw new Exception('商品名:' . $product["product_name"] . 'の在庫数が足りない為購入出来ません');
+        }
+        $insert_order_detail_sql =
+            "INSERT INTO ec_order_details_table (order_id, product_id, product_qty, price, create_date) 
+                VALUES (:order_id, :product_id, :product_qty, :price, :create_date)";
+        $insert_order_detail_param = [
+            ":order_id" => $order_id,
+            ":product_id" => $product_id,
+            ":product_qty" => $cart_qty,
+            ":price" => $price,
+            ":create_date" => $date
+        ];
+        $order_detail = sqlFetchData($insert_order_detail_sql, $insert_order_detail_param);
+        if (!$order_detail) {
+            throw new Exception("注文詳細の作成に失敗しました");
+        }
+        //在庫数を更新
+        updateStock($product_id, $cart_qty);
+        //総額の計算
+        $total_amount += $price * $cart_qty;
+    }
+    return $total_amount;
+}
+
 //カートから削除する
-function deleteFromCart($error_message)
+function deleteFromCart($pdo)
 {
     try {
-        $pdo = getConnection();
         $pdo->beginTransaction();
         $product_id = $_POST["product_id"];
         $user_id = $_SESSION["user_id"];
@@ -135,72 +151,99 @@ function deleteFromCart($error_message)
             ":product_id" => $product_id,
             ":user_id" => $user_id
         ];
-        $delete = sql_fetch_data($delete_sql, $param);
-        if (isset($delete) && empty($error_message)) {
+        $result = sqlFetchData($delete_sql, $param);
+        if (isset($result)) {
             $pdo->commit();
+            $message = "カートから商品を削除しました";
+            return $message;
         }
     } catch (Exception $e) {
-        $error_message[] = 'データベースエラー：' . $e->getMessage();
         $pdo->rollBack();
-        return $error_message;
+        throw new Exception('エラー：' . $e->getMessage());
+    }
+}
+
+//数量のバリデーション
+function cartIntValidation()
+{
+    if (isset($_POST["stock_qty"])) {
+        if ($_POST["stock_qty"] < 1 || !is_numeric($_POST["stock_qty"])) {
+            throw new Exception("在庫数は1以上の整数を指定してください");
+        }
+    }
+}
+
+//カート内の商品の数量を変更 
+function updateCartQty()
+{
+    $product_qty = (int) $_POST["product_qty"] ?? 0;
+    if ($product_qty > 0) {
+        $sql = "UPDATE ec_cart_table SET product_qty = :product_qty, update_date = :update_date WHERE user_id = :user_id AND product_id = :product_id";
+        $product_qty = $_POST["product_qty"];
+        $update_date = currentDate();
+        $user_id = $_SESSION["user_id"];
+        $product_id = $_POST["product_id"];
+        $param = [
+            ":product_qty" => $product_qty,
+            ":update_date" => $update_date,
+            ":user_id" => $user_id,
+            ":product_id" => $product_id
+        ];
+        return sqlFetchData($sql, $param, true);
     }
 }
 
 //カートの中の商品数を変更する
-function updateQtyFromCart($error_message)
+function updateQtyFromCart($pdo)
 {
     try {
-        $pdo = getConnection();
         $pdo->beginTransaction();
+        cartIntValidation();
         $result = updateCartQty();
-        if (!$error_message && $result) {
+        if ($result) {
             $pdo->commit();
+            $message = "商品数を変更しました";
+            return $message;
         }
     } catch (Exception $e) {
-        $error_message[] = 'データベースエラー：' . $e->getMessage();
         $pdo->rollBack();
-        return $error_message;
+        throw new Exception('エラー：' . $e->getMessage());
     }
 }
 
 //カートの中を取得する
 function getCart()
 {
-    $sql = "SELECT
-            p.product_id,i.image_name,p.product_name,p.price,c.product_qty
-            FROM ec_cart_table c
-            INNER JOIN ec_product_table p
-            ON c.product_id = p.product_id 
-            JOIN ec_image_table i
-            ON p.product_id = i.product_id
-            WHERE c.user_id = :user_id;";
+    $sql = "SELECT p.product_id,i.image_name,p.product_name,p.price,c.product_qty,s.stock_qty
+    FROM ec_cart_table c INNER JOIN ec_product_table p
+    ON c.product_id = p.product_id
+    JOIN ec_image_table i
+    ON p.product_id = i.product_id
+    JOIN ec_stock_table s
+    ON p.product_id = s.product_id 
+    WHERE c.user_id = :user_id;";
     $user_id = $_SESSION["user_id"];
     $param = [
         ":user_id" => $user_id
     ];
-    return sql_fetch_data($sql, $param);
+    $result = sqlFetchData($sql, $param);
+    if ($result !== false) {
+        return $result;
+    } else {
+        throw new Exception("カートに何も入っていません");
+    }
 }
 
-//カート内の商品の数量を変更 
-function updateCartQty()
+//小計金額を計算する
+function getTotalAmount($cart_data)
 {
-    try {
-        $product_qty = (int) $_POST["product_qty"] ?? 0;
-        if ($product_qty > 0) {
-            $sql = "UPDATE ec_cart_table SET product_qty = :product_qty, update_date = :update_date WHERE user_id = :user_id AND product_id = :product_id";
-            $product_qty = $_POST["product_qty"];
-            $update_date = currentDate();
-            $user_id = $_SESSION["user_id"];
-            $product_id = $_POST["product_id"];
-            $param = [
-                ":product_qty" => $product_qty,
-                ":update_date" => $update_date,
-                ":user_id" => $user_id,
-                ":product_id" => $product_id
-            ];
-            return sql_fetch_data($sql, $param, true);
+    $total_amount = 0;
+    foreach ($cart_data as $product) {
+        if (isset($product["price"])) {
+            $price = $product["price"];
+            $qty = $product["product_qty"];
+            $total_amount += $price * $qty;
         }
-    } catch (Exception $e) {
-        throw $e;
     }
+    return $total_amount;
 }

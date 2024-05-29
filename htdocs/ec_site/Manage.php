@@ -1,56 +1,55 @@
 <?php
 //定数(const.php)を読み込む
-require_once '../../include/config/const.php';
-//Model(ec_model.php)を読み込む
-require_once '../../include/model/common_model.php';
-//Model(ec_product_model.php)を読み込む
-require_once '../../include/model/manage_model.php';
+require_once "../../include/config/const.php";
+//Modelを読み込む
+require_once "../../include/model/common_model.php";
+require_once "../../include/model/manage_model.php";
 
 session_start();
 adminCheck();
-/* $product_data = [];//商品データ */
 $message = [];
 $error_message = [];
 $pdo = getConnection();
+$product_name = isset($_POST["product_name"]) ? $_POST["product_name"] : "";
+$price = isset($_POST["price"]) ? $_POST["price"] : 0;
+$public_flg = isset($_POST["public_flg"]) ? $_POST["public_flg"] : 0;
+$image = isset($_POST["image"]) ? $_POST["image"] : "";
 $action = $_POST["action"] ?? "";
-$product_name = isset($post['product_name']) ? $post['product_name'] : '';
-$price = isset($post['price']) ? $post['price'] : 0;
-$public_flg = isset($post['public_flg']) ? $post['public_flg'] : 0;
-$image = isset($post['image']) ? $post['image'] : '';
-
 
 //追加
 if ($action === "add") {
-    if (isset($_POST["product_name"]) && isset($_POST["price"]) && isset($_POST["stock_qty"]) && $_POST["stock_qty"] >= 0 && isset($_FILES["image"]) && isset($_POST["public_flg"])) {
-        $error_message = addProductManage($error_message);
-        if (empty($error_message)) {
-            $message[] = "商品の追加に成功しました";
-        }
-    }
-}
-//切り替え
-if ($action === "toggle") {
-    $error_message = togglePublicManage($error_message);
-    if (empty($error_message)) {
-        $message[] = "商品の公開ステータスを切り替えました";
+    try {
+        validationAddProduct($pdo);
+        $message[] = addProductToDatabase($pdo);
+    } catch (Exception $e) {
+        $error_message[] = $e->getMessage();
     }
 }
 
+//切り替え
+if ($action === "toggle") {
+    try {
+        $message = togglePublicManage($pdo);
+    } catch (Exception $e) {
+        $error_message[] = $e->getMessage();
+    }
+}
 //削除
 if ($action === "delete") {
-    $error_message = deleteProductManage($error_message);
-    if (empty($error_message)) {
-        $message[] = "商品を削除しました";
+    try {
+        $message = deleteProductManage($pdo);
+    } catch (Exception $e) {
+        $error_message[] = $e->getMessage();
     }
 }
 
 //数量変更
 if ($action === "update_qty") {
-    if (isset($_POST["product_id"]) && isset($_POST["stock_qty"]) && $_POST["stock_qty"] >= 0) {
-        $error_message = updateQty($error_message);
-    }
-    if (empty($error_message)) {
-        $message[] = "数量の変更に成功しました";
+    try {
+        manageIntValidation();
+            $message = updateQty($pdo);
+    } catch (Exception $e) {
+        $error_message[] = $e->getMessage();
     }
 }
 
@@ -58,8 +57,7 @@ $display_error_message = convertToArray($error_message) ?? [];
 $display_message = convertToArray($message) ?? [];
 $product_data = getProducts() ?? "";
 $array_product_data = convertToArray($product_data) ?? [];
-$product_view_data = h_array($array_product_data) ?? [];
-
+$product_view_data = hArray($array_product_data) ?? [];
 
 //CSSファイルの選択
 $stylesheet = CSS_DIR;

@@ -1,9 +1,8 @@
 <?php
-//定数(const.php)を読み込む
+//定数を読み込む
 require_once '../../include/config/const.php';
-//Model(common_model.php)を読み込む
+//Modelを読み込む
 require_once '../../include/model/common_model.php';
-//Model(cart_model.php)を読み込む
 require_once '../../include/model/purchase_model.php';
 
 session_start();
@@ -13,17 +12,22 @@ $message = [];
 $error_message = [];
 $user_id = $_SESSION["user_id"];
 $order_id = $_SESSION["order_id"] ?? "";
-$error_message = sessionOrderIdCheck($error_message);
-
-if (!empty($order_id)) {
-    $pdo = getConnection();
-    $order_data = getOrderDetails($pdo) ?? "";
-    $display_message = convertToArray($message) ?? [];
-    $total_amount = getTotalAmount() ?? [];
-    $array_order_data = convertToArray($order_data) ?? [];
-    $order_view_data = h_array($array_order_data) ?? [];
+$order_data = [];
+try {
+    if (!empty($order_id)) {
+        $pdo = getConnection();
+        sessionOrderIdCheck();
+        $total_amount = getTotalAmountSql() ?? [];
+        $order_data = getOrderDetails($pdo);
+    }
+} catch (Exception $e) {
+    $error_message[] = $e->getMessage();
 }
+
+$display_message = convertToArray($message) ?? [];
 $display_error_message = convertToArray($error_message) ?? [];
+$array_order_data = convertToArray($order_data) ?? [];
+$order_view_data = hArray($array_order_data) ?? [];
 
 //CSSファイルの選択
 $stylesheet = CSS_DIR;

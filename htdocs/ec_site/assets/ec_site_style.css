@@ -21,40 +21,59 @@ header {
     color: rgb(159, 255, 223);
 }
 
+main{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-main,footer {
-    margin-left: 10%;
-    padding: 0;
+.message_area,
+.form_container,
+footer {
+    margin:0 auto;
+    display: block;
+    align-items: center;
+    justify-content: center;
 }
 
 .message_area {
     border: solid #000000CB 1px;
     display: flex;
     flex-direction: column;
-    margin-bottom: 15px;
+    align-items: center;
+    margin:auto auto 15px auto;
     width: 400px;
     padding: 10px;
 }
 
-.error_message,.normal_message {
+.error_message,
+.normal_message {
     font-weight: bold;
     text-align: center;
 }
+
 .error_message {
     color: #ff00008f;
 }
 
-.contents, footer {
-    max-width: 600px;
+.contents,
+footer {
+    max-width: 800px;
     margin: 0 auto;
-}
-
-.form_container,h1{
     display: block;
-    text-align:center;
+    text-align: center;
+
 }
 
-/* テーブル全体のスタイル */
+.form_container {
+    display: block;
+    justify-content: center;
+    background-color: #5555551a;
+    padding: 20px;
+    width: 300px;
+    height: auto;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -63,30 +82,26 @@ table {
     text-align: left;
 }
 
-/* ヘッダーのスタイル */
-th, td {
+th,
+td {
     padding: 12px;
     border: 1px solid #ddd;
 }
 
-/* ヘッダーの背景色と文字の色 */
 th {
     background-color: #f4f4f4;
     color: #333;
 }
 
-/* 交互の行に背景色を付ける */
 tr:nth-child(even) {
     background-color: #f9f9f9;
 }
 
-/* 画像のスタイル */
 td img {
     width: 100px;
     height: auto;
 }
 
-/* フォームのボタンのスタイル */
 input[type="submit"] {
     background-color: #4CAF50;
     color: white;
@@ -101,16 +116,25 @@ input[type="submit"]:hover {
     background-color: #45a049;
 }
 
-/* 数量入力フィールドのスタイル */
-input[type="number"] {
-    width: 50px;
+input[type="number"],
+input[type="text"],
+input[type="password"] {
+    width: 200px;
     padding: 5px;
     font-size: 16px;
     border: 1px solid #ddd;
     border-radius: 4px;
 }
 
-footer p{
+input[type="number"] {
+    width: 100px;
+    padding: 5px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+footer p {
     text-align: center;
-    
+
 }

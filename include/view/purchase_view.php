@@ -1,6 +1,6 @@
-<?php if (!empty($order_id)): ?>
-    <h1>購入が完了しました</h1>
-    <p>小計金額：<?php print $total_amount["total_amount"]; ?>円</p>
+<?php if (isset($order_id) && !empty($order_id)): ?>
+    <h2>購入が完了しました</h2>
+    <h3>小計金額：<?php print $total_amount["total_amount"]; ?>円</h3>
     <table>
         <tr>
             <th>画像</th>

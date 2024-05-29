@@ -1,30 +1,33 @@
 <?php
-//認証確認
+//認証情報を確認
 function authenticateUser()
 {
-    try {
-        $check_user = checkUser();
-        $password = $_POST["password"];
-        if ($check_user && password_verify($password, $check_user["password"])) {
-            return $check_user;
-        } else {
-            return "ユーザー名またはパスワードが一致しません";
-        }
-    } catch (PDOException $e) {
-        return 'データベースエラー：' . $e->getMessage();
+    $user_name = $_POST["user_name"];
+    $password = $_POST["password"];
+    if ($user_name === "" || $password === "") {
+        throw new Exception("ユーザー名とパスワードを入力してください");
+    }
+    $check_user = validationUserName();
+    if ($check_user && password_verify($password, $check_user["password"])) {
+        return $check_user;
+    } else {
+        throw new Exception("ユーザー名またはパスワードが一致しません");
     }
 }
 
-//文字の長さ確認
+//文字の長さを検証
 function validationLength($input, $type)
 {
-    $message = "";
-    if ($type === "user_name" && strlen($input) < 5) {
-        $message = "ユーザー名は5文字以上必要です";
-    } elseif ($type === "password" && strlen($input) < 8) {
-        $message = "パスワードは8文字以上必要です";
+    $user_name = $_POST["user_name"];
+    $password = $_POST["password"];
+    if ($user_name === "" || $password === "") {
+        throw new Exception("ユーザーとパスワードを入力してください");
     }
-    return $message;
+    if ($type === "user_name" && strlen($input) < 5) {
+        throw new Exception("ユーザー名は5文字以上必要です");
+    } elseif ($type === "password" && strlen($input) < 8) {
+        throw new Exception("パスワードは8文字以上必要です");
+    }
 }
 
 //半角英数かアンダースコアのみか確認
@@ -33,28 +36,20 @@ function validationStr($input)
     return preg_match("/^[a-zA-Z0-9_]+$/", $input);
 }
 
-
 //フォームのバリデーションチェックをまとめて行う
-function validationUserForm($error_message)
+function validationUserForm()
 {
     $user_name = $_POST["user_name"];
     $password = $_POST["password"];
-    $user_name_error = validationLength($user_name, "user_name");
-    if ($user_name_error) {
-        $error_message[] = $user_name_error;
-    }
-    $password_error = validationLength($password, "password");
-    if ($password_error) {
-        $error_message[] = $password_error;
-    }
+    validationLength($user_name, "user_name");
+    validationLength($password, "password");
     if (!validationStr($user_name) || !validationStr($password)) {
-        $error_message[] = "ユーザー名とパスワードは半角英数またはアンダースコアで入力してください";
+        throw new Exception("ユーザー名とパスワードは半角英数またはアンダースコアで入力してください");
     }
-    return $error_message;
 }
 
 //データベースに接続し、重複チェックを行う
-function checkUser()
+function validationUserName()
 {
     $sql = "SELECT user_id,user_name,password FROM ec_user_table WHERE user_name = :user_name LIMIT 1";
     $user_param = [
@@ -63,49 +58,53 @@ function checkUser()
     return duplicateCheck($sql, $user_param);
 }
 
+//ユーザー情報をDBに挿入
 function createUser()
 {
-    try {
-        $user_name = $_POST["user_name"];
-        $password = $_POST["password"];
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $sql = "INSERT INTO ec_user_table(user_name, password, create_date) VALUES(:user_name, :password, :create_date)";
-        $params = [
-            ":user_name" => $user_name,
-            ":password" => $hashed_password,
-            ":create_date" => currentDate()
-        ];
-        $result = sql_fetch_data($sql, $params);
-        if ($result) {
-            return $result;
-        } else {
-            return false;
-        }
-    } catch (PDOException $e) {
-        throw $e;
+    $user_name = $_POST["user_name"];
+    $password = $_POST["password"];
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+    $sql = "INSERT INTO ec_user_table(user_name, password, create_date) VALUES(:user_name, :password, :create_date)";
+    $params = [
+        ":user_name" => $user_name,
+        ":password" => $hashed_password,
+        ":create_date" => currentDate()
+    ];
+    $result = sqlFetchData($sql, $params);
+    if ($result) {
+        return $result;
+    } else {
+        return false;
     }
 }
 
+//ユーザー名重複のバリデーションを行ってからユーザー登録処理
 function register($password)
 {
-    try {
-        $pdo = getConnection();
-        $pdo->beginTransaction();
-        $user_name = $_POST["user_name"];
-        if (checkUser()) {
-            $pdo->rollBack();
-            return "そのユーザー名は既に使用されています";
-        }
-        $result = createUser();
-        if ($result) {
-            $pdo->commit();
-            return true;
-        } else {
-            $pdo->rollBack();
-            return "ユーザー登録に失敗しました";
-        }
-    } catch (PDOException $e) {
+    $pdo = getConnection();
+    $pdo->beginTransaction();
+    if (validationUserName()) {
         $pdo->rollBack();
-        return "データベースエラー：" . $e->getMessage();
+        throw new Exception("そのユーザー名は既に使用されています");
     }
+    $result = createUser();
+    if ($result) {
+        $pdo->commit();
+        return true;
+    } else {
+        $pdo->rollBack();
+        throw new Exception("ユーザー登録に失敗しました");
+    }
+}
+
+//ユーザー登録完了処理
+function registerSuccess(){
+    if(isset($_SESSION["success"])){
+        unset($_SESSION);
+        $message[] = "登録完了しました";
+        return $message;
+    }else{
+        throw new Exception("セッションが保存されていないか登録に失敗しました");
+    }
+
 }

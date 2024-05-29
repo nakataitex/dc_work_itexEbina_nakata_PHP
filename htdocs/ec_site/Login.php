@@ -10,13 +10,13 @@ loginCheck();
 
 $error_message = [];
 $message = [];
-$user = $_POST["user_name"] ?? "";
+$user_name = $_POST["user_name"] ?? "";
 $password = $_POST["password"] ?? "";
-
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    if ($user_name === "" || $password === "") {
-        $error_message[] = "ユーザーとパスワードを入力してください";
-    } else {
+try {
+    if ($_SERVER["REQUEST_METHOD"] === "POST") {
+        $user_name = $_POST["user_name"];
+        $password = $_POST["password"];
+        validationUserForm();
         $result = authenticateUser();
         if (is_array($result)) { // ユーザー情報が配列で返ってきた場合
             session_regenerate_id(true);
@@ -30,10 +30,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 header("Location: ./catalog.php");
                 exit();
             }
-        } else {
-            $error_message[] = $result; // エラーメッセージを追加
         }
     }
+} catch (Exception $e) {
+    $error_message[] = $e->getMessage();
 }
 
 $display_error_message = convertToArray($error_message) ?? "";
@@ -45,7 +45,7 @@ $stylesheet = CSS_DIR;
 $page_title = "ログイン画面";
 //ページリンク
 $menus = [
-    "./register.php" => "会員登録"
+    "./register.php" => "ユーザー登録"
 ];
 
 //viewファイル読み込み

@@ -1,25 +1,27 @@
 <?php
+//定数ファイル読み込み
+require_once "../../include/config/const.php";
 //modelファイル読み込み
 require_once "../../include/model/common_model.php";
+require_once "../../include/model/user_model.php";
 session_start();
 loginCheck();
 
 $message = [];
-$error_message =[];
+$error_message = [];
 
-if($_SESSION["success"]){
-    unset($_SESSION);
-    $message[] = "登録完了しました";
-}else{
-    $error_message = "登録に失敗しました。管理者に連絡してください";
+if (isset($_SESSION["success"])) {
+    try {
+        $message = registerSuccess();
+    } catch (Exception $e) {
+        $error_message[] = $e->getMessage();
+    }
 }
-
-
 
 //CSSファイルの選択
 $stylesheet = CSS_DIR;
 //ページタイトル
-$page_title = "登録完了";
+$page_title = "ユーザー登録完了";
 //CSSファイルの選択
 $menus = [
     "./login.php" => "ログイン"

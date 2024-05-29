@@ -20,11 +20,10 @@
             </ul>
         </div>
     </header>
-
     <body>
         <div class="contents">
-            <?php
-            if (!empty($error_message) || !empty($message)): ?>
+            <h1><?php echo $page_title; ?>ページ</h1>
+            <?php if ($error_message || $message): ?>
                 <div class="message_area">
                     <div class="error_message">
                         <?php displayMessage($display_error_message) ?? ""; ?>
