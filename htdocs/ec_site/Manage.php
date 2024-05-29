@@ -17,42 +17,41 @@ $image = isset($_POST["image"]) ? $_POST["image"] : "";
 $action = $_POST["action"] ?? "";
 
 //追加
-if ($action === "add") {
-    try {
-        validationAddProduct($pdo);
-        $message[] = addProductToDatabase($pdo);
-    } catch (Exception $e) {
-        $error_message[] = $e->getMessage();
+if ($_SERVER("REQUEST_METHOD") === "POST") {
+    if ($action === "add") {
+        try {
+            validationAddProduct($pdo);
+            $message[] = addProductToDatabase($pdo);
+        } catch (Exception $e) {
+            $error_message[] = $e->getMessage();
+        }
     }
-}
-
-//切り替え
-if ($action === "toggle") {
-    try {
-        $message = togglePublicManage($pdo);
-    } catch (Exception $e) {
-        $error_message[] = $e->getMessage();
+    //切り替え
+    if ($action === "toggle") {
+        try {
+            $message = togglePublicManage($pdo);
+        } catch (Exception $e) {
+            $error_message[] = $e->getMessage();
+        }
     }
-}
-//削除
-if ($action === "delete") {
-    try {
-        $message = deleteProductManage($pdo);
-    } catch (Exception $e) {
-        $error_message[] = $e->getMessage();
+    //削除
+    if ($action === "delete") {
+        try {
+            $message = deleteProductManage($pdo);
+        } catch (Exception $e) {
+            $error_message[] = $e->getMessage();
+        }
     }
-}
-
-//数量変更
-if ($action === "update_qty") {
-    try {
-        manageIntValidation();
+    //数量変更
+    if ($action === "update_qty") {
+        try {
+            manageIntValidation();
             $message = updateQty($pdo);
-    } catch (Exception $e) {
-        $error_message[] = $e->getMessage();
+        } catch (Exception $e) {
+            $error_message[] = $e->getMessage();
+        }
     }
 }
-
 $display_error_message = convertToArray($error_message) ?? [];
 $display_message = convertToArray($message) ?? [];
 $product_data = getProducts() ?? "";
