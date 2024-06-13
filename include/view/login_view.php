@@ -5,7 +5,7 @@
     <form action="" method="post">
         <dl>
             <div class="form-group">
-                <dt>ユーザー名：<span class="required">必須</span>(半角英数またはアンダースコア5文字以上)</dt>
+                <dt>ユーザー名：<span class="required">必須</span>(半角英数またはアンダースコアで5文字以上)</dt>
                 </dt>
                 <dd>
                     <input type="text" name="user_name" size="15" maxlength="20" pattern="[a-zA-Z0-9_]+" minlength="5"
@@ -13,7 +13,7 @@
                 </dd>
             </div>
             <div class="form-group">
-                <dt>パスワード：<span class="required">必須</span>(半角英数またはアンダースコア8文字以上)</dt>
+                <dt>パスワード：<span class="required">必須</span>(半角英数またはアンダースコアで8文字以上)</dt>
                 </dt>
                 <dd>
                     <input type="password" name="password" size="15" maxlength="30" minlength="8"
