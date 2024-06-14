@@ -21,7 +21,7 @@
                             <p class="low-stock">残り少なくなっています<br>
                                 在庫<?php print ($value['stock_qty']); ?>個</p>
                         <?php endif; ?>
-                        <form action="" method="POST">
+                        <form method="POST">
                             <input type="hidden" name="product_id" value="<?php echo $value["product_id"]; ?>">
                             <?php print ($value["stock_qty"] === "0") ? '<br>' : '<input type="number" name="product_qty" value="1" min="1" required>'; ?>
                             <input type="hidden" name="action" value="add">

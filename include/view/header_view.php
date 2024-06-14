@@ -20,16 +20,15 @@
             </ul>
         </div>
     </header>
-    <body>
-        <div class="contents">
-            <h1><?php echo $page_title; ?>ページ</h1>
-            <?php if ($error_message || $message): ?>
-                <div class="message_area">
-                    <div class="error_message">
-                        <?php displayMessage($display_error_message) ?? ""; ?>
-                    </div>
-                    <div class="normal_message">
-                        <?php displayMessage($display_message) ?? ""; ?>
-                    </div>
+    <div class="contents">
+        <h1><?php echo $page_title; ?>ページ</h1>
+        <?php if ($error_message || $message): ?>
+            <div class="message_area">
+                <div class="error_message">
+                    <?php displayMessage($display_error_message) ?? ""; ?>
                 </div>
-            <?php endif; ?>
+                <div class="normal_message">
+                    <?php displayMessage($display_message) ?? ""; ?>
+                </div>
+            </div>
+        <?php endif; ?>

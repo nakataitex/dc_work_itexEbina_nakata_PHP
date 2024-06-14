@@ -12,8 +12,8 @@
 </div>
 <?php if (isset($product_data) && !empty($product_data)): ?>
     <table>
+        <caption>商品一覧</caption>
         <tr>
-            <caption>商品一覧</caption>
             <th>商品名</th>
             <th>画像</th>
             <th>在庫数</th>
@@ -25,7 +25,7 @@
             <div class="<?php print ($value["public_flg"] === "1") ? "public" : "private"; ?>">
                 <tr>
                     <td><?php print $value["product_name"]; ?><br>
-                        <form action="" method="POST">
+                        <form method="POST">
                             <input type="hidden" name="product_id" value="<?php echo $value["product_id"]; ?>">
                             <input type="hidden" name="action" value="delete">
                             <input type="submit" value="削除する">
@@ -34,7 +34,7 @@
                     <td><img src="<?php print IMG_DIR . $value["image_name"]; ?>" alt="<?php print $value["product_name"]; ?>">
                     </td>
                     <td><?php print $value["stock_qty"]; ?>個<br>
-                        <form action="" method="POST">
+                        <form method="POST">
                             <input type="hidden" name="product_id" value="<?php echo $value["product_id"]; ?>">
                             <input type="hidden" name="action" value="update_qty">
                             <input type="number" name="stock_qty" min="0" required>
@@ -44,7 +44,7 @@
                     <td><?php print $value["price"]; ?>円</td>
                     <td><?php print ($value["public_flg"] === "1") ? "公開中" : "非公開"; ?>
                         <br>
-                        <form action="" method="POST">
+                        <form method="POST">
                             <input type="hidden" name="product_id" value="<?php echo $value["product_id"]; ?>">
                             <input type="hidden" name="action" value="toggle">
                             <input type="submit" value="<?php print ($value["public_flg"] === "1") ? "非公開にする" : "公開する";
