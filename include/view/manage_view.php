@@ -1,3 +1,4 @@
+<p>商品追加</p>
 <div class="form_container">
     <form method="post" enctype="multipart/form-data">
         商品名：<input type="text" name="product_name" required><br>
@@ -22,7 +23,6 @@
         </tr>
         <?php
         foreach ($product_view_data as $value) { ?>
-            <div class="<?php print ($value["public_flg"] === "1") ? "public" : "private"; ?>">
                 <tr>
                     <td><?php print $value["product_name"]; ?><br>
                         <form method="POST">
@@ -53,7 +53,6 @@
                         <br>
                     </td>
                 </tr>
-            </div>
         <?php } ?>
     </table>
 <?php endif; ?>

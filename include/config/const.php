@@ -1,4 +1,4 @@
-<?
+<?php
 //定数を記述
 define('DSN', 'mysql:host=localhost;dbname=xb513874_u338x');
 define('LOGIN_USER', 'xb513874_fpu2g');

@@ -8,7 +8,6 @@
         </tr>
         <?php
         foreach ($catalog_view_data as $value) { ?>
-            <div class="<?php print ($value["stock_qty"] === "0") ? "sold_out" : "sale"; ?>">
                 <tr>
                     <td><?php print $value["product_name"]; ?><br>
                     </td>
@@ -30,7 +29,6 @@
                         <br>
                     </td>
                 </tr>
-            </div>
         <?php } ?>
     </table>
 <?php endif; ?>
