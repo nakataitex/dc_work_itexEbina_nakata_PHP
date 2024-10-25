@@ -25,7 +25,7 @@ $error_msg = [];
     <form action="image_view.php" method="post" enctype="multipart/form-data">
         タイトル：<input type="text" name="title"><br>
         画像：<input type="file" name="img"><br>
-        <input type="submit" value="投稿" name = "share">
+        <input type="submit" value="投稿" name="share">
     </form>
     <?php
     //DB接続
@@ -70,7 +70,7 @@ $error_msg = [];
             exit();
         else://タイトルと半角英数OK
             if (isset($_FILES['img']))://imgが送られたら
-                
+    
                 $img_path = 'img/' . basename($_FILES['img']['name']);//保存先
                 if (move_uploaded_file($_FILES['img']['tmp_name'], $img_path))://アップロードしてみて成功したら(true/false)
                     $filename = $_FILES['img']['name'];//ファイル名
@@ -95,6 +95,8 @@ $error_msg = [];
 
 
     ?>
+
+    <a href="./image_view.php">公開画像一覧ページへ移動</a>
 </body>
 
 </html>

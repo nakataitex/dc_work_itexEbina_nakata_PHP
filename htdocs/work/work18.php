@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>work17</title>
+    <title>work18</title>
 </head>
 
 <body>
@@ -40,14 +40,15 @@
     for ($i = 0; $i < $disp_count; $i++) {
         $val = $disp_data[$i];
         //      echo $val['name']. ' ' . $val['age']. '<br>';
-        echo htmlspecialchars($disp_data[$i]["name"],ENT_QUOTES) .' ' . htmlspecialchars($disp_data[$i]['age'], ENT_QUOTES) . '<br>';
+        echo htmlspecialchars($disp_data[$i]["name"], ENT_QUOTES) . ' ' . htmlspecialchars($disp_data[$i]['age'], ENT_QUOTES) . '<br>';
     }
+    $a = 0;
     $b = $a + 1;
     for ($a = 1; $a <= $max_page; $a++) {//最大ページ分のリンク作成
-        echo '<a href="?page='. $a .'">'.$a.'ページ </a>';
+        echo '<a href="?page=' . $a . '">' . $a . 'ページ </a>';
     }
     ;
-    ?>;
+    ?>
 </body>
 
 </html>

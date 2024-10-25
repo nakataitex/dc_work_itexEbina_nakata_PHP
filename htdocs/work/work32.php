@@ -33,7 +33,6 @@
         echo "catch時に表示<br>";
         echo $e->getMessage();
         $db->rollback();//エラー起きたらロールバック
-
     }
     ?>
 

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>work19</title>
 </head>
 
 <body>
@@ -12,18 +12,21 @@
         タイトル<br><input type="text" name="title"><br>
         書き込み内容<br><input type="text" name="text"><br>
         <input type="submit" value="送信">
-        <?
-        $title = $_POST['title'];
-        $text = $_POST['text'];
+        <?php
+        if ($_SERVER["REQUEST_METHOD"] == "POST"):
+            $title = $_POST['title'];
+            $text = $_POST['text'];
+        endif;
+
         //書き込み
         if (!empty($_POST)):
-            if ($_POST["title"] != '' || $_POST["text"] != ''):
+            if ($_POST["title"] != '' && $_POST["text"] != ''):
                 $fw = fopen("work19.txt", "a");
                 fseek($fw, 0, SEEK_END);
                 fwrite($fw, 'タイトル：' . $title . '内容：' . $text . '\n');
                 fclose($fw);
             else:
-                echo "<p>入力情報が不足しています</p>";
+                echo "<p>入力情報が不足しています。タイトルと内容の両方を入力してください。</p>";
             endif;
         endif;
         //読み込み

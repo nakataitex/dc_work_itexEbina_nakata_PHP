@@ -29,7 +29,6 @@ $price_val;
         echo "接続成功<br>";
         $db->set_charset("utf8");//文字コード指定
     endif;
-    //必要？
     if ($_SERVER["REQUEST_METHOD"] == "POST")://ポストでインサートを送信したら
         if (isset($_POST['insert']))://インサートが押されたら
             $db->begin_transaction();//トランザクション開始
@@ -65,9 +64,9 @@ $price_val;
             endif;
             //エラー確認
             //var_dump($error_msg);
-
+    
             //DELETEが押されたら
-        elseif(isset($_POST["delete"])):
+        elseif (isset($_POST["delete"])):
             $db->begin_transaction();//トランザクション開始
             //DELETEクエリ
             $delete_query = "
@@ -78,14 +77,14 @@ $price_val;
                 product_id = 21;
             ";
             //削除実行
-            if($result = $db->query($delete_query)):
+            if ($result = $db->query($delete_query)):
                 $row = $db->affected_rows;
             else:
-                $error_msg[] = "DELETE実行エラー[実行SQL]".$delete_query;
+                $error_msg[] = "DELETE実行エラー[実行SQL]" . $delete_query;
             endif;
 
-        
-            if(count($error_msg) > 0)://エラーがあれば
+
+            if (count($error_msg) > 0)://エラーがあれば
                 echo "削除失敗<br>";
                 $db->rollback();//ロールバック。全取り消し
             else://なければ

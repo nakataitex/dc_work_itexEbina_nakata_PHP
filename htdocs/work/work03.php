@@ -6,4 +6,3 @@ print $boolean = true;
 print $boolean = false;
 print $null = null;
 print $empty = "";
-?>

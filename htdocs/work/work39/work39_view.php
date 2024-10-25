@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>try56</title>
-    <link rel="stylesheet" href="work39_ec_site_style.css">
+    <link rel="stylesheet" href="./work39_style.css">
 </head>
 
 <body>

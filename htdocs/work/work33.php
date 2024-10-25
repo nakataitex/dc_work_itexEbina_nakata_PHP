@@ -30,8 +30,8 @@
 
         //実行
         $stmt->execute();
-        
-        print_r($stmt);
+/*         
+        print_r($stmt); */
 
         while ($row = $stmt->fetch()):
             echo '<br>'.$row["product_name"] . 'は' . $row["price"] . '円です';

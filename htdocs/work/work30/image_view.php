@@ -66,20 +66,18 @@ $error_msg = [];
         $images[] = $row;
     endwhile;
     ?>
-        <ul class="image_list">
-            <?
-            foreach ($images as $image):
-                if ($image['public_flg'] == 1):
-                    echo '<li class="image_tile">タイトル：' . $image["image_name"] . '<br>ファイル名：' . $image["file_name"] . '<br>
+    <ul class="image_list">
+        <?
+        foreach ($images as $image):
+            if ($image['public_flg'] == 1):
+                echo '<li class="image_tile">タイトル：' . $image["image_name"] . '<br>ファイル名：' . $image["file_name"] . '<br>
             <img src="' . $img_dir . $image['file_name'] . '" alt="' . $image_name . '"></li>';
-                endif;
-            endforeach;
-            ?>
-            <br>
-        </ul>
-    <a href="./upload.php">画像投稿ページへ移動</a>
-
-
+            endif;
+        endforeach;
+        ?>
+        <br>
+    </ul>
+    <a href="./image_form.php">一般画像投稿ページへ移動</a>
 </body>
 
 </html>

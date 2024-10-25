@@ -53,7 +53,7 @@ $date = date("Y-m-d");
         background-color: #7d7d7d;
     }
 
-/*     .img_share {
+    /*     .img_share {
         position: relative;
     }
 
@@ -126,6 +126,37 @@ $date = date("Y-m-d");
 
             $img = $_POST['image_title'] ?? '';
             $imgfile = $_FILES['img'] ?? null;
+
+            //画像の公開切り替え
+            if (isset($_POST["image_id"]))://公開/非公開を押したら
+                $get_image_id = $_POST['image_id'];
+                $db->begin_transaction();//トランザクション開始
+                //公開切り替え
+                $public_change =
+                    'UPDATE
+image_sharing
+SET
+public_flg = 1 - public_flg
+WHERE
+image_id = ' . $_POST["image_id"] . ';';
+                //実行
+                if ($public_change_result = $db->query($public_change)):
+                    $row = $db->affected_rows;
+                    //クエリが実行出来るか
+                    //echo "クエリが実行できた<br>";
+                else:
+                    $error_msg[] = 'INSERT実行エラー[実行SQL]' . $public_change;
+                endif;
+
+                if (count($error_msg) > 0)://エラー時の処理
+                    $notifications[] = '<p class="messege">エラーが発生した為作業を取り消します。</p><br>';
+                    $db->rollback();
+                else://成功時の処理
+                    $notifications[] = '<p class="messege">' . $row . ' 件の切り替えに成功しました。<br>切り替えた画像のID: ' . $get_image_id;
+                    $db->commit();
+                    //var_dump($error_msg);
+                endif;
+            endif;
 
             //画像とタイトルが送信されたら
             if ($_SERVER['REQUEST_METHOD'] === 'POST'):
@@ -225,43 +256,15 @@ $date = date("Y-m-d");
                 endforeach;
 
 
-                //画像の公開切り替え
-                if (isset($_POST["image_id"]))://公開/非公開を押したら
-                    $get_image_id = $_POST['image_id'];
-                    $db->begin_transaction();//トランザクション開始
-                    //公開切り替え
-                    $public_change =
-                        'UPDATE
-        image_sharing
-    SET
-        public_flg = 1 - public_flg
-    WHERE
-    image_id = ' . $_POST["image_id"] . ';';
-                    //実行
-                    if ($public_change_result = $db->query($public_change)):
-                        $row = $db->affected_rows;
-                        //クエリが実行出来るか
-                        //echo "クエリが実行できた<br>";
-                    else:
-                        $error_msg[] = 'INSERT実行エラー[実行SQL]' . $public_change;
-                    endif;
 
-                    if (count($error_msg) > 0)://エラー時の処理
-                        $notifications[] = '<p class="messege">エラーが発生した為作業を取り消します。</p><br>';
-                        $db->rollback();
-                    else://成功時の処理
-                        $notifications[] = '<p class="messege">' . $row . ' 件の切り替えに成功しました。<br>切り替えた画像のID: ' . $get_image_id;
-                        $db->commit();
-                        //var_dump($error_msg);
-                    endif;
-                endif;
                 ?>
                 <br>
                 </form>
             </ul>
         </div>
     </div>
-    <a href="./image_view.php">画像一覧ページへ移動</a>
+    <a href="./image_view.php">公開画像一覧ページへ移動</a>
+    <a href="./image_form.php">一般画像投稿ページへ移動</a>
 
 </body>
 
