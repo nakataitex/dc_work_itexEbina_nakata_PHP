@@ -5,7 +5,7 @@ function checkCartQty()
 {
     $user_id = $_SESSION["user_id"];
     $product_id = $_POST["product_id"];
-    $check_cart_sql = 'SELECT product_qty, product_id, user_id FROM ec_cart_table WHERE user_id = :user_id AND product_id = :product_id';
+    $check_cart_sql = 'SELECT product_qty, product_id, user_id FROM ec_cart_table_test WHERE user_id = :user_id AND product_id = :product_id';
     $sql_param = [
         ":user_id" => $user_id,
         ":product_id" => $product_id
@@ -32,7 +32,7 @@ function addCart()
         $date = currentDate();
         if ($add_qty > 0) {
             if ($cart_qty === 0) {
-                $sql = "INSERT INTO ec_cart_table (user_id, product_id,product_qty, create_date)VALUES (:user_id,:product_id, :product_qty, :create_date)";
+                $sql = "INSERT INTO ec_cart_table_test (user_id, product_id,product_qty, create_date)VALUES (:user_id,:product_id, :product_qty, :create_date)";
                 $param = [
                     ":user_id" => $user_id,
                     ":product_id" => $product_id,
@@ -40,7 +40,7 @@ function addCart()
                     ":create_date" => $date
                 ];
             } else {
-                $sql = "UPDATE ec_cart_table SET product_qty = :product_qty, update_date = :update_date WHERE user_id = :user_id AND product_id = :product_id";
+                $sql = "UPDATE ec_cart_table_test SET product_qty = :product_qty, update_date = :update_date WHERE user_id = :user_id AND product_id = :product_id";
                 $param = [
                     ":product_qty" => $product_qty,
                     ":update_date" => $date,
@@ -65,10 +65,12 @@ function addCart()
 //商品リストを表示
 function getCatalog()
 {
-    $sql = "SELECT p.product_id,p.product_name, p.price,i.image_name,s.stock_qty FROM ec_stock_table s
-    INNER JOIN ec_image_table i
+    $sql = "SELECT p.product_id,p.product_name, p.price,i.image_name,s.stock_qty FROM ec_stock_table_test s
+    INNER JOIN ec_image_table_test i
     ON s.product_id = i.product_id 
-    JOIN ec_product_table p
-    ON i.product_id = p.product_id WHERE p.public_flg = 1";
+    JOIN ec_product_table_test p
+    ON i.product_id = p.product_id
+    WHERE p.public_flg = 1
+    LIMIT 0 , 10";
     return sqlFetchData($sql);
 }

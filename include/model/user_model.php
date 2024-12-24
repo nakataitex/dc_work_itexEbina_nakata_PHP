@@ -51,7 +51,7 @@ function validationUserForm()
 //データベースに接続し、重複チェックを行う
 function validationUserName()
 {
-    $sql = "SELECT user_id,user_name,password FROM ec_user_table WHERE user_name = :user_name LIMIT 1";
+    $sql = "SELECT user_id,user_name,password FROM ec_user_table_test WHERE user_name = :user_name LIMIT 1";
     $user_param = [
         ":user_name" => $_POST["user_name"]
     ];
@@ -64,7 +64,7 @@ function createUser()
     $user_name = $_POST["user_name"];
     $password = $_POST["password"];
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-    $sql = "INSERT INTO ec_user_table(user_name, password, create_date) VALUES(:user_name, :password, :create_date)";
+    $sql = "INSERT INTO ec_user_table_test(user_name, password, create_date) VALUES(:user_name, :password, :create_date)";
     $params = [
         ":user_name" => $user_name,
         ":password" => $hashed_password,

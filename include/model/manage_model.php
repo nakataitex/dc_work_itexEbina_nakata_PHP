@@ -43,7 +43,7 @@ function validationAddProduct($pdo)
         if (exif_imagetype($temp_file) !== IMAGETYPE_JPEG && exif_imagetype($temp_file) !== IMAGETYPE_PNG) {
             throw new Exception("対応している画像を選択してください(jpg/jpegまたはpng)");
         }
-        $duplicate_check_sql = "SELECT count(*) count from ec_product_table where product_name = :product_name";
+        $duplicate_check_sql = "SELECT count(*) count from ec_product_table_test where product_name = :product_name";
         $stmt = $pdo->prepare($duplicate_check_sql);
         $stmt->bindValue(":product_name", $product_name);
         $stmt->execute();
@@ -108,7 +108,7 @@ function addProductToDatabase($pdo)
 function insertProduct($form)
 {
     try {
-        $sql = "INSERT INTO ec_product_table (product_name, price, public_flg, create_date) VALUES (:product_name, :price, :public_flg, :create_date)";
+        $sql = "INSERT INTO ec_product_table_test (product_name, price, public_flg, create_date) VALUES (:product_name, :price, :public_flg, :create_date)";
         $param = [
             ":product_name" => $form[":product_name"],
             ":price" => $form[":price"],
@@ -126,7 +126,7 @@ function insertProduct($form)
 function insertImage($form)
 {
     try {
-        $sql = "INSERT INTO ec_image_table (product_id, image_name, create_date) VALUES (:product_id,:image_name,:create_date)";
+        $sql = "INSERT INTO ec_image_table_test (product_id, image_name, create_date) VALUES (:product_id,:image_name,:create_date)";
         $param = [
             ":product_id" => $form[":product_id"],
             ":image_name" => $form[":image_name"],
@@ -142,7 +142,7 @@ function insertImage($form)
 function insertStock($form)
 {
     try {
-        $sql = "INSERT INTO ec_stock_table (product_id, stock_qty,create_date) VALUES(:product_id, :stock_qty, :create_date)";
+        $sql = "INSERT INTO ec_stock_table_test (product_id, stock_qty,create_date) VALUES(:product_id, :stock_qty, :create_date)";
         $param = [
             ":product_id" => $form[":product_id"],
             ":stock_qty" => $form[":stock_qty"],
@@ -164,7 +164,7 @@ function togglePublicManage($pdo)
         $product_id = $_POST["product_id"];
         $sql =
             'UPDATE 
-                    ec_product_table 
+                    ec_product_table_test 
                 SET 
                 public_flg = 1 - public_flg ,update_date = :update_date
                 WHERE 
@@ -193,12 +193,12 @@ function deleteProductManage($pdo)
 {
     try {
         $pdo->beginTransaction();
-        $select_sql = "SELECT i.image_name FROM ec_product_table p INNER JOIN ec_image_table i ON p.product_id = i.product_id  WHERE p.product_id = :product_id";
+        $select_sql = "SELECT i.image_name FROM ec_product_table_test p INNER JOIN ec_image_table_test i ON p.product_id = i.product_id  WHERE p.product_id = :product_id";
         $product_id = $_POST["product_id"];
         $param = [":product_id" => $product_id];
         $get_image_name = sqlFetchData($select_sql, $param, true);
         $image_name = $get_image_name["image_name"];
-        $delete_sql = "DELETE FROM ec_product_table WHERE product_id = :product_id";
+        $delete_sql = "DELETE FROM ec_product_table_test WHERE product_id = :product_id";
         $result = sqlFetchData($delete_sql, $param);
         if ($result) {
             unlink(IMG_DIR . $image_name);
@@ -220,7 +220,7 @@ function updateQty($pdo)
 {
     try {
         $pdo->beginTransaction();
-        $sql = "UPDATE ec_stock_table SET stock_qty =:stock_qty WHERE product_id =:product_id";
+        $sql = "UPDATE ec_stock_table_test SET stock_qty =:stock_qty WHERE product_id =:product_id";
         $product_id = $_POST["product_id"];
         $stock_qty = $_POST["stock_qty"];
         $param = [
@@ -246,10 +246,10 @@ function updateQty($pdo)
 function getProducts()
 {
     $sql = "SELECT
-     * FROM ec_product_table 
-    INNER JOIN ec_image_table 
-    ON ec_product_table.product_id = ec_image_table.product_id 
-    JOIN ec_stock_table 
-    ON ec_image_table.product_id = ec_stock_table.product_id;";
+     * FROM ec_product_table_test 
+    INNER JOIN ec_image_table_test 
+    ON ec_product_table_test.product_id = ec_image_table_test.product_id 
+    JOIN ec_stock_table_test 
+    ON ec_image_table_test.product_id = ec_stock_table_test.product_id;";
     return sqlFetchData($sql);
 }

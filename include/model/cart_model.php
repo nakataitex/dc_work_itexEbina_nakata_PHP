@@ -2,7 +2,7 @@
 //価格を確認
 function getPrice($product_id)
 {
-    $sql = "SELECT price FROM ec_product_table WHERE product_id = :product_id";
+    $sql = "SELECT price FROM ec_product_table_test WHERE product_id = :product_id";
     $param = [
         ":product_id" => $product_id
     ];
@@ -16,7 +16,7 @@ function getPrice($product_id)
 //在庫数を確認
 function getStockQty($product_id)
 {
-    $sql = "SELECT stock_qty FROM ec_stock_table WHERE product_id = :product_id";
+    $sql = "SELECT stock_qty FROM ec_stock_table_test WHERE product_id = :product_id";
     $param = [
         ":product_id" => $product_id
     ];
@@ -30,7 +30,7 @@ function getStockQty($product_id)
 //購入に合わせて在庫数を更新
 function updateStock($product_id, $cart_qty)
 {
-    $sql = "UPDATE ec_stock_table SET stock_qty = stock_qty - :cart_qty WHERE product_id = :product_id";
+    $sql = "UPDATE ec_stock_table_test SET stock_qty = stock_qty - :cart_qty WHERE product_id = :product_id";
     $param = [
         ":cart_qty" => $cart_qty,
         ":product_id" => $product_id
@@ -46,7 +46,7 @@ function allDeleteFromCart()
 {
     try {
         $user_id = $_SESSION["user_id"];
-        $delete_sql = "DELETE FROM ec_cart_table WHERE user_id = :user_id";
+        $delete_sql = "DELETE FROM ec_cart_table_test WHERE user_id = :user_id";
         $param = [
             ":user_id" => $user_id
         ];
@@ -67,7 +67,7 @@ function order($cart_data, $pdo)
         $user_id = $_SESSION["user_id"];
         $date = currentDate();
         $total_amount = 0;
-        $insert_order_sql = "INSERT INTO ec_order_table (user_id, order_date, total_amount, create_date)
+        $insert_order_sql = "INSERT INTO ec_order_table_test (user_id, order_date, total_amount, create_date)
         VALUES(:user_id, :order_date, :total_amount, :create_date)";
         $insert_order_param = [
             ":user_id" => $user_id,
@@ -79,7 +79,7 @@ function order($cart_data, $pdo)
         $order_id = $pdo->lastInsertId();
         $total_amount = insertOrderDetail($cart_data, $pdo, $date);
         //注文詳細を作成
-        $update_order_sql = "UPDATE ec_order_table 
+        $update_order_sql = "UPDATE ec_order_table_test 
         SET total_amount = :total_amount, update_date = :update_date
         WHERE order_id = :order_id";
         $update_order_param = [
@@ -118,7 +118,7 @@ function insertOrderDetail($cart_data, $pdo, $date)
             throw new Exception('商品名:' . $product["product_name"] . 'の在庫数が足りない為購入出来ません');
         }
         $insert_order_detail_sql =
-            "INSERT INTO ec_order_details_table (order_id, product_id, product_qty, price, create_date) 
+            "INSERT INTO ec_order_details_table_test (order_id, product_id, product_qty, price, create_date) 
                 VALUES (:order_id, :product_id, :product_qty, :price, :create_date)";
         $insert_order_detail_param = [
             ":order_id" => $order_id,
@@ -146,7 +146,7 @@ function deleteFromCart($pdo)
         $pdo->beginTransaction();
         $product_id = $_POST["product_id"];
         $user_id = $_SESSION["user_id"];
-        $delete_sql = "DELETE FROM ec_cart_table WHERE product_id = :product_id AND user_id = :user_id";
+        $delete_sql = "DELETE FROM ec_cart_table_test WHERE product_id = :product_id AND user_id = :user_id";
         $param = [
             ":product_id" => $product_id,
             ":user_id" => $user_id
@@ -178,7 +178,7 @@ function updateCartQty()
 {
     $product_qty = (int) $_POST["product_qty"] ?? 0;
     if ($product_qty > 0) {
-        $sql = "UPDATE ec_cart_table SET product_qty = :product_qty, update_date = :update_date WHERE user_id = :user_id AND product_id = :product_id";
+        $sql = "UPDATE ec_cart_table_test SET product_qty = :product_qty, update_date = :update_date WHERE user_id = :user_id AND product_id = :product_id";
         $product_qty = $_POST["product_qty"];
         $update_date = currentDate();
         $user_id = $_SESSION["user_id"];
@@ -215,11 +215,11 @@ function updateQtyFromCart($pdo)
 function getCart()
 {
     $sql = "SELECT p.product_id,i.image_name,p.product_name,p.price,c.product_qty,s.stock_qty
-    FROM ec_cart_table c INNER JOIN ec_product_table p
+    FROM ec_cart_table_test c INNER JOIN ec_product_table_test p
     ON c.product_id = p.product_id
-    JOIN ec_image_table i
+    JOIN ec_image_table_test i
     ON p.product_id = i.product_id
-    JOIN ec_stock_table s
+    JOIN ec_stock_table_test s
     ON p.product_id = s.product_id 
     WHERE c.user_id = :user_id;";
     $user_id = $_SESSION["user_id"];

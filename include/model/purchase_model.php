@@ -4,9 +4,9 @@ function getOrderDetails($pdo)
 {
     $order_id = $_SESSION["order_id"];
     $sql = "SELECT p.product_name, od.product_qty, od.price,i.image_name
-        FROM ec_order_details_table od
-        INNER JOIN ec_product_table p ON od.product_id = p.product_id 
-                INNER JOIN ec_image_table i ON p.product_id = i.product_id WHERE od.order_id = :order_id";
+        FROM ec_order_details_table_test od
+        INNER JOIN ec_product_table_test p ON od.product_id = p.product_id 
+                INNER JOIN ec_image_table_test i ON p.product_id = i.product_id WHERE od.order_id = :order_id";
     $param = [":order_id" => $order_id];
     $result = sqlFetchData($sql, $param);
     if ($result) {
@@ -20,7 +20,7 @@ function getTotalAmountSql()
     try {
         $order_id = $_SESSION["order_id"];
         $sql = "SELECT total_amount
-        FROM ec_order_table
+        FROM ec_order_table_test
         WHERE order_id = :order_id";
         $param = [":order_id" => $order_id];
         $result = sqlFetchData($sql, $param, true);
