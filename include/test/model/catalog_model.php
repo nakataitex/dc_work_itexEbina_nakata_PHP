@@ -65,12 +65,30 @@ function addCart()
 //商品リストを表示
 function getCatalog()
 {
-    $sql = "SELECT p.product_id,p.product_name, p.price,i.image_name,s.stock_qty FROM ec_stock_table_test s
+    $sql = "SELECT p.product_id,p.product_name, p.price,i.image_name,s.stock_qty
+    FROM ec_stock_table_test s
     INNER JOIN ec_image_table_test i
     ON s.product_id = i.product_id 
     JOIN ec_product_table_test p
     ON i.product_id = p.product_id
-    WHERE p.public_flg = 1
-    LIMIT 0 , 10";
+    WHERE p.public_flg = 1";
+    return sqlFetchData($sql);
+}
+;
+
+//商品リストを表示（テスト）
+function getCatalogVariable()
+{
+    $pagination_limit = DEFAULT_PAGINATION_LIMIT;
+    $page_number = DEFAULT_PAGE_NUMBER;
+    $sql = 'SELECT p.product_id, p.product_name, p.price,i.image_name,s.stock_qty 
+        FROM ec_stock_table_test s 
+        INNER JOIN ec_image_table_test i 
+        ON s.product_id = i.product_id 
+        JOIN ec_product_table_test p 
+        ON i.product_id = p.product_id 
+        WHERE p.public_flg = 1 
+        LIMIT ' . $pagination_limit . ' 
+        OFFSET ' . $page_number;
     return sqlFetchData($sql);
 }

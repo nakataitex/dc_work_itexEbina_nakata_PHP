@@ -1,9 +1,9 @@
 <?php
 //定数(const.php)を読み込む
-require_once "../../include/config/const.php";
+require_once "../../include/test/config/const.php";
 //Modelを読み込む
-require_once "../../include/model/common_model.php";
-require_once "../../include/model/manage_model.php";
+require_once "../../include/test/model/common_model.php";
+require_once "../../include/test/model/manage_model.php";
 
 session_start();
 adminCheck();
@@ -64,10 +64,11 @@ $stylesheet = CSS_DIR;
 $page_title = "商品管理";
 //ページリンク
 $menus = [
+    "./catalog_test.php" => "商品一覧ページ(テスト)",
     "./logout.php" => "ログアウト"
 ];
 
 //Viewファイルを読み込む
-include_once "../../include/view/header_view.php";
-include_once "../../include/view/manage_view.php";
-include_once "../../include/view/footer_view.php";
+include_once "../../include/test/view/header_view.php";
+include_once "../../include/test/view/manage_view.php";
+include_once "../../include/test/view/footer_view.php";

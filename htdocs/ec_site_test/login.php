@@ -1,9 +1,9 @@
 <?php
 //constファイル読み込み
-require_once "../../include/config/const.php";
+require_once "../../include/test/config/const.php";
 //modelファイル読み込み
-require_once "../../include/model/common_model.php";
-require_once "../../include/model/user_model.php";
+require_once "../../include/test/model/common_model.php";
+require_once "../../include/test/model/user_model.php";
 
 session_start();
 loginCheck();
@@ -49,6 +49,6 @@ $menus = [
 ];
 
 //viewファイル読み込み
-include_once "../../include/view/header_view.php";
-include_once "../../include/view/login_view.php";
-include_once "../../include/view/footer_view.php";
+include_once "../../include/test/view/header_view.php";
+include_once "../../include/test/view/login_view.php";
+include_once "../../include/test/view/footer_view.php";

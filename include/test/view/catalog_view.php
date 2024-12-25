@@ -1,4 +1,7 @@
 <?php if (isset($catalog_data) && !empty($catalog_data)): ?>
+    <div class="paging">
+
+    </div>
     <table>
         <tr>
             <th>商品名</th>

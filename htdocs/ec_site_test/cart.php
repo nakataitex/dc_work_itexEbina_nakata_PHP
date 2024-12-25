@@ -1,9 +1,9 @@
 <?php
 //定数を読み込む
-require_once '../../include/config/const.php';
+require_once '../../include/test/config/const.php';
 //Modelを読み込む
-require_once '../../include/model/common_model.php';
-require_once '../../include/model/cart_model.php';
+require_once '../../include/test/model/common_model.php';
+require_once '../../include/test/model/cart_model.php';
 
 session_start();
 commonUserCheck();
@@ -81,6 +81,6 @@ $menus = [
 ];
 
 //Viewファイルを読み込む
-include_once "../../include/view/header_view.php";
-include_once "../../include/view/cart_view.php";
-include_once "../../include/view/footer_view.php";
+include_once "../../include/test/view/header_view.php";
+include_once "../../include/test/view/cart_view.php";
+include_once "../../include/test/view/footer_view.php";
