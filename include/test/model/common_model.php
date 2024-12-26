@@ -102,7 +102,7 @@ function hArray($array)
     return $array;
 }
 
-//SQLを実行
+//SQLを実行して複数のデータを取得
 function sqlFetchData($sql, $params = [], $singleRow = false)
 {
     try {
@@ -128,4 +128,42 @@ function sqlFetchData($sql, $params = [], $singleRow = false)
     } catch (Exception $e) {
         throw $e;
     }
+}
+
+
+//SQL実行
+function sqlFetch($sql)
+{
+    try {
+        $pdo = getConnection();
+        $stmt = $pdo->prepare($sql);
+        $result = $stmt->execute();
+        if($result){
+            return $stmt->fetchColumn();
+        }else{
+            throw new Exception("データベースエラー");
+        }
+    } catch (Exception $e) {
+        throw $e;
+    }
+}
+
+//商品数をカウント
+function getProductCount($public_flg = null)
+{
+    $sql =
+        'SELECT COUNT(*) product_id 
+    FROM ec_product_table_test';
+    switch ($public_flg) {
+        case null:
+            echo "null";
+            break;
+        case 1:
+            echo "公開";
+            break;
+        default:
+            echo "非公開";
+            break;
+    }
+    return sqlFetch($sql);
 }

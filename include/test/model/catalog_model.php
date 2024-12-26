@@ -77,10 +77,16 @@ function getCatalog()
 ;
 
 //商品リストを表示（テスト）
-function getCatalogVariable()
+function getCatalogVariable($pagination_limit = DEFAULT_PAGINATION_LIMIT, $page_num = 0)
 {
-    $pagination_limit = DEFAULT_PAGINATION_LIMIT;
-    $page_number = DEFAULT_PAGE_NUMBER;
+    if (isset($_GET["pagination_limit"])) {
+        $pagination_limit = $_GET["pagination_limit"];
+    }
+
+    if (isset($_GET["page_num"])) {
+        $page_num = $_GET["page_num"];
+    }
+
     $sql = 'SELECT p.product_id, p.product_name, p.price,i.image_name,s.stock_qty 
         FROM ec_stock_table_test s 
         INNER JOIN ec_image_table_test i 
@@ -89,6 +95,6 @@ function getCatalogVariable()
         ON i.product_id = p.product_id 
         WHERE p.public_flg = 1 
         LIMIT ' . $pagination_limit . ' 
-        OFFSET ' . $page_number;
+        OFFSET ' . $page_num;
     return sqlFetchData($sql);
 }
