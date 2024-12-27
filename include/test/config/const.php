@@ -14,3 +14,7 @@ define('CSS_DIR', './assets/ec_site_style.css');
 
 //商品一覧のデフォルトの表示件数
 define('DEFAULT_PAGINATION_LIMIT', 10);
+
+//商品の公開ステータス
+define('PUBLIC_FLG_PUBLIC', 1);
+define('PUBLIC_FLG_PRIVATE', 0);

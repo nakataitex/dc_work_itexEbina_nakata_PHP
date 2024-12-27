@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 $display_error_message = convertToArray($error_message) ?? "";
 $display_message = convertToArray($message) ?? "";
-$catalog_num = getProductCount(1);
+$catalog_num = getProductCount(PUBLIC_FLG_PUBLIC);
 $catalog_data = getCatalogVariable() ?? "";
 $array_catalog_data = convertToArray($catalog_data) ?? "";
 $catalog_view_data = hArray($array_catalog_data) ?? "";
