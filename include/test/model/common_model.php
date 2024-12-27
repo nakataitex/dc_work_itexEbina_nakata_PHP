@@ -138,9 +138,9 @@ function sqlFetch($sql)
         $pdo = getConnection();
         $stmt = $pdo->prepare($sql);
         $result = $stmt->execute();
-        if($result){
+        if ($result) {
             return $stmt->fetchColumn();
-        }else{
+        } else {
             throw new Exception("データベースエラー");
         }
     } catch (Exception $e) {
@@ -156,13 +156,13 @@ function getProductCount($public_flg = null)
     FROM ec_product_table_test';
     switch ($public_flg) {
         case null:
-            echo "null";
+            echo "すべての商品をカウントしました";
             break;
-        case 1:
-            echo "公開";
+        case 0:
+            $sql = $sql . ' WHERE public_flg = 0';
             break;
         default:
-            echo "非公開";
+            $sql = $sql . ' WHERE public_flg = 1';
             break;
     }
     return sqlFetch($sql);
