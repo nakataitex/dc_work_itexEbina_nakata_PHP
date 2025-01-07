@@ -1,7 +1,7 @@
 <?php if (isset($catalog_data) && !empty($catalog_data)): ?>
     <div class="paging">
     <form method="GET" >
-    <label for="paging_limit">1ページ当たりの表示数</label>
+    <label for="paging_limit">1ページ当たりの最大表示数(現在:<?php print $pagination_limit;?>件)</label>
     <select name="limit" id="paging_limit">
         <option value="10">10件</option>
         <option value="20">20件</option>
@@ -9,9 +9,9 @@
         <option value="40">40件</option>
         <option value="50">50件</option>
     </select>
-
+    <input type="submit" value="更新">
     </form>
-    <p><?php print $catalog_num;?> 件中 <?php  ;?> 件表示中</p>
+    <p><?php print $catalog_num;?> 件中 <?php print $current_display_count; ?> 件表示中</p>
     </div>
     <table>
         <tr>
@@ -37,8 +37,7 @@
                             <?php ($value["stock_qty"] === "0") ? "" : print '<input type="submit" value="カートに入れる">'; ?>
                         </form>
                         <?php if ($value["stock_qty"] < 20 && $value["stock_qty"] > 0): ?>
-                            <p class="low-stock">残り少なくなっています<br>
-                                在庫<?php print ($value['stock_qty']); ?>個</p>
+                            <p class="low-stock">残りわずか：在庫<?php print ($value['stock_qty']); ?>個</p>
                         <?php endif; ?>
                     </td>
                 </tr>

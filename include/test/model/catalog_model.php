@@ -79,8 +79,8 @@ function getCatalog()
 //商品リストを表示（テスト）
 function getCatalogVariable($pagination_limit = DEFAULT_PAGINATION_LIMIT, $page_num = 0)
 {
-    if (isset($_GET["pagination_limit"])) {
-        $pagination_limit = $_GET["pagination_limit"];
+    if (isset($_GET["limit"])) {
+        $pagination_limit = $_GET["limit"];
     }
 
     if (isset($_GET["page_num"])) {
@@ -97,4 +97,22 @@ function getCatalogVariable($pagination_limit = DEFAULT_PAGINATION_LIMIT, $page_
         LIMIT ' . $pagination_limit . ' 
         OFFSET ' . $page_num;
     return sqlFetchData($sql);
+}
+
+
+//表示数の管理
+function getViewLimit()
+{
+    if (isset($_GET["limit"])) {
+        if (preg_match('/^[0-9]+$/', $_GET["limit"]) && DEFAULT_PAGINATION_MAX_LIMIT >= $_GET["limit"]  && 0 < $_GET["limit"]) {
+            $limit = $_GET["limit"];
+            return $limit;
+        } else {
+            $limit = DEFAULT_PAGINATION_LIMIT;
+            return $limit;
+        }
+    } else {
+        $limit = DEFAULT_PAGINATION_LIMIT;
+        return $limit;
+    }
 }
