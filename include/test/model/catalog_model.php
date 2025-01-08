@@ -76,17 +76,38 @@ function getCatalog()
 }
 ;
 
-//商品リストを表示（テスト）
-function getCatalogVariable($pagination_limit = DEFAULT_PAGINATION_LIMIT, $page_num = 0)
+//商品リストを表示（分割）
+//引数いらなくなるかも
+function getCatalogVariable($pagination_limit = DEFAULT_PAGINATION_LIMIT, $page_num = 1)
 {
     if (isset($_GET["limit"])) {
         $pagination_limit = $_GET["limit"];
+    } else {
+        $pagination_limit = DEFAULT_PAGINATION_LIMIT;
     }
 
     if (isset($_GET["page_num"])) {
         $page_num = $_GET["page_num"];
+    } else {
+        $page_num = 1;
+    }
+    //2ページ目以降ページ毎に表示内容を変更
+    if ($page_num > 0) {
+        $Currently_displayed_item = $pagination_limit * ($page_num);
     }
 
+    /*     $sql = 'SELECT p.product_id, p.product_name, p.price,i.image_name,s.stock_qty 
+            FROM ec_stock_table_test s 
+            INNER JOIN ec_image_table_test i 
+            ON s.product_id = i.product_id 
+            JOIN ec_product_table_test p 
+            ON i.product_id = p.product_id 
+            WHERE p.public_flg = 1 
+            LIMIT ' . $pagination_limit . ' 
+            OFFSET ' . $page_num; */
+
+
+    //挙動チェック
     $sql = 'SELECT p.product_id, p.product_name, p.price,i.image_name,s.stock_qty 
         FROM ec_stock_table_test s 
         INNER JOIN ec_image_table_test i 
@@ -94,25 +115,44 @@ function getCatalogVariable($pagination_limit = DEFAULT_PAGINATION_LIMIT, $page_
         JOIN ec_product_table_test p 
         ON i.product_id = p.product_id 
         WHERE p.public_flg = 1 
-        LIMIT ' . $pagination_limit . ' 
-        OFFSET ' . $page_num;
+        LIMIT 5 
+        OFFSET 0';
     return sqlFetchData($sql);
 }
 
+//現在のページを取得
+function get_page_num()
+{
+    if (!isset($_GET["page_num"])) {
+        //設定されてない場合は1ページ目にする。
+        $page_num = 1;
+        return $page_num;
+    } else {
+        $page_num = $_GET["page_num"];
+        return $page_num;
+    }
+}
+
+//最大ページ数を取得
+function get_max_page_num($pagination_limit, $catalog_num)
+{
+    $max_page_num = ceil($catalog_num / $pagination_limit);
+    return $max_page_num;
+}
 
 //表示数の管理
 function getViewLimit()
 {
     if (isset($_GET["limit"])) {
-        if (preg_match('/^[0-9]+$/', $_GET["limit"]) && DEFAULT_PAGINATION_MAX_LIMIT >= $_GET["limit"]  && 0 < $_GET["limit"]) {
-            $limit = $_GET["limit"];
-            return $limit;
+        if (preg_match('/^[0-9]+$/', $_GET["limit"]) && DEFAULT_PAGINATION_MAX_LIMIT >= $_GET["limit"] && 0 < $_GET["limit"]) {
+            $pagination_limit = $_GET["limit"];
+            return $pagination_limit;
         } else {
-            $limit = DEFAULT_PAGINATION_LIMIT;
-            return $limit;
+            $pagination_limit = DEFAULT_PAGINATION_LIMIT;
+            return $pagination_limit;
         }
     } else {
-        $limit = DEFAULT_PAGINATION_LIMIT;
-        return $limit;
+        $pagination_limit = DEFAULT_PAGINATION_LIMIT;
+        return $pagination_limit;
     }
 }
