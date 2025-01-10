@@ -37,10 +37,6 @@ $catalog_view_data = hArray($array_catalog_data) ?? "";
 $current_display_count = count($catalog_data);
 $max_page_num = get_max_page_num($pagination_limit, $catalog_num);
 
-//ページネーションの全ページ数(テスト)
-print get_max_page_num($pagination_limit, $catalog_num);
-
-
 //CSSファイルの選択
 $stylesheet = CSS_DIR;
 //ページタイトル
