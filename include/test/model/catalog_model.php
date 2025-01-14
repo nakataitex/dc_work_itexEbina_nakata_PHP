@@ -76,8 +76,42 @@ function getCatalog()
 }
 
 
+function sqlfetchDataTest($sql, $params = [], $singleRow = false)
+{
+    try {
+        $pdo = getConnection();
+        $stmt = $pdo->prepare($sql);
+
+        foreach ($params as $key => $param) {
+            $value = $param['value'];
+            $type = $param['type'] ?? PDO::PARAM_STR; // 型が指定されていない場合は文字列型
+
+            $stmt->bindValue($key, $value, $type); // 型を指定
+        }
+
+        $result = $stmt->execute();
+        if ($result) {
+            if (stripos($sql, 'SELECT') === 0) {
+                if ($singleRow) {
+                    return $stmt->fetch(PDO::FETCH_ASSOC);
+                } else {
+                    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+                }
+            } else {
+                return $stmt->rowCount();
+            }
+        } else {
+            return false;
+        }
+    } catch (PDOException $e) {
+
+        error_log("SQL Error: " . $sql . "\n" . $e->getMessage());
+        throw new Exception("データベースエラー: " . $e->getMessage());
+    }
+}
+
 //商品リストを表示（分割）
-function getCatalogVariable($product_public_flg)
+function getCatalogVariable($pdo, $product_public_flg)
 {
 
     $pagination_limit = isset($_GET["limit"]) ? intval($_GET["limit"]) : DEFAULT_PAGINATION_LIMIT;
@@ -95,18 +129,40 @@ function getCatalogVariable($product_public_flg)
         JOIN ec_product_table_test p 
         ON i.product_id = p.product_id 
         WHERE p.public_flg = :public_flg 
-        LIMIT :limit 
+        LIMIT :limit
         OFFSET :offset';
-        $param = [
-            ":public_flg" => $product_public_flg,
-            ":limit" => $pagination_limit,
-            ":offset" => $currently_displayed_item
+        $params = [
+            ":public_flg" => ['value' => $product_public_flg, 'type' => PDO::PARAM_INT],
+            ":limit" => ['value' => $pagination_limit, 'type' => PDO::PARAM_INT],
+            ":offset" => [
+                'value' => $currently_displayed_item,
+                'type' => PDO::PARAM_INT
+            ]
         ];
-        $success = sqlFetchData($sql, $param);
-
-        return $success;
+        $result = sqlfetchDataTest($sql, $params);
+        print_r($result);
+        if ($result) {
+            return $result;
+        }
     } catch (PDOException $e) {
         throw new Exception("データベースエラー:商品の取得に失敗しました");
+    }
+}
+
+
+
+
+function getOrderDetails($pdo)
+{
+    $order_id = $_SESSION["order_id"];
+    $sql = "SELECT p.product_name, od.product_qty, od.price,i.image_name
+        FROM ec_order_details_table_test od
+        INNER JOIN ec_product_table_test p ON od.product_id = p.product_id 
+                INNER JOIN ec_image_table_test i ON p.product_id = i.product_id WHERE od.order_id = :order_id";
+    $param = [":order_id" => $order_id];
+    $result = sqlFetchData($sql, $param);
+    if ($result) {
+        return $result;
     }
 }
 
