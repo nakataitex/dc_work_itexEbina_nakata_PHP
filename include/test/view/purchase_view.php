@@ -3,18 +3,18 @@
     <h3>小計金額：<?php print $total_amount["total_amount"]; ?>円</h3>
     <table>
         <tr>
-            <th>画像</th>
             <th>商品名</th>
+            <th>画像</th>
             <th>数量</th>
             <th>価格</th>
         </tr>
         <?php foreach ($order_view_data as $product): ?>
             <tr>
-                <td><img src="<?php print IMG_DIR . $product['image_name'] ?>" alt="<?php print $product['product_name'] ?>">
+                <td class="product_name"><?php print $product['product_name'] ?></td>
+                <td class="product_img"><img src="<?php print IMG_DIR . $product['image_name'] ?>" alt="<?php print $product['product_name'] ?>">
                 </td>
-                <td><?php print $product['product_name'] ?></td>
-                <td><?php print $product['product_qty'] ?></td>
-                <td><?php print $product['price'] ?></td>
+                <td class="product_qty"><?php print $product['product_qty'] ?></td>
+                <td class="product_price"><?php print $product['price'] ?></td>
             </tr>
         <?php endforeach; ?>
 

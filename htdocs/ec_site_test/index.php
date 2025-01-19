@@ -39,6 +39,9 @@ try {
 $display_error_message = convertToArray($error_message) ?? "";
 $display_message = convertToArray($message) ?? "";
 
+//ログイン出来なかった場合、右上にユーザー名が表示されない様にする為
+$user_name = "";
+
 //CSSファイルの選択
 $stylesheet = CSS_DIR;
 //ページタイトル

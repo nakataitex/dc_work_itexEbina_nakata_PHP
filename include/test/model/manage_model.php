@@ -3,7 +3,7 @@
 function adminCheck()
 {
     if (!isset($_SESSION["login"]) || !isset($_SESSION["user_name"]) || $_SESSION["user_name"] !== "ec_admin") {
-        header("Location: ./login.php");
+        header("Location: ./index.php");
         exit();
     }
 }

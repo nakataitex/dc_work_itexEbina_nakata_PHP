@@ -7,6 +7,9 @@ require_once "../../include/test/model/user_model.php";
 
 session_start();
 loginCheck();
+//ユーザー名を表示して挨拶
+$user_name = helloUser(getUserName());
+
 $error_message = [];
 $message = [];
 
@@ -36,7 +39,7 @@ $stylesheet = CSS_DIR;
 $page_title = "ユーザー登録";
 //CSSファイルの選択
 $menus = [
-    "./login.php" => "ログイン"
+    "./index.php" => "ログイン"
 ];
 
 //Viewファイルを読み込む

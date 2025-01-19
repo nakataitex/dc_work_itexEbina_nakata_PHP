@@ -4,23 +4,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[ECサイト]<?php echo $page_title; ?></title>
+    <title>[ECサイトポートフォリオ]Electronic Commerce Site<?php echo $page_title; ?></title>
     <link rel="stylesheet" href="<?php echo $stylesheet; ?>">
 </head>
 
 <body>
     <header>
-        <h1>ECサイト</h1>
         <div class="header_menu">
-            <h2>Menu</h2>
-            <ul>
-                <?php foreach ($menus as $menu_link => $menu_title): ?>
-                    <li><a href="<?php echo $menu_link; ?>"><?php echo $menu_title; ?></a></li>
-                <?php endforeach; ?>
-            </ul>
+            <div class="title">
+                <h1><a href="<?php print TOP_PAGE_URL;?>">Electronic Commerce Site</a></h1>
+                <img src="./assets/ec_logo_a.png" alt="logo">
+            </div>
+            <p><?php echo $user_name ?></p>
         </div>
+        <div class="header_menu_under">
+            <?php foreach ($menus as $menu_link => $menu_title): ?>
+                <div><a href="<?php echo $menu_link; ?>"><?php echo $menu_title; ?></a></div>
+            <?php endforeach; ?>
+        </div>
+
+        </div>
+
     </header>
-    <div class="contents">
+    <main>
         <h1><?php echo $page_title; ?>ページ</h1>
         <?php if ($error_message || $message): ?>
             <div class="message_area">

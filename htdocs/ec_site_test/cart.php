@@ -8,6 +8,8 @@ require_once '../../include/test/model/cart_model.php';
 session_start();
 commonUserCheck();
 
+$user_name = helloUser(getUserName());
+
 $product_data = [];//商品データ
 $message = [];
 $error_message = [];
@@ -76,7 +78,9 @@ $stylesheet = CSS_DIR;
 $page_title = "カート";
 //ページリンク
 $menus = [
-    "./catalog.php" => "商品一覧",
+    "catalog.php" => "商品一覧",
+    "#1" => "注文履歴(準備中)",
+    "#2" => "アカウント(準備中)",
     "./logout.php" => "ログアウト"
 ];
 

@@ -18,5 +18,5 @@ foreach ($params as $param) {
 
 //ログアウト処理が出来たらログイン画面へ遷移
 if (!isset($_SESSION["login"])) {
-    header("Location: ./login.php");
+    header("Location: ./index.php");
 }

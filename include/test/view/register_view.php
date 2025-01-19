@@ -1,3 +1,6 @@
+<p>登録済みの方はこちらからログインしてください。</p>
+<p>&raquo;<a href="./index.php">ログインする</a></p>
+
 <p>登録に必要な事項をご記入ください。</p>
 <div class="form_container">
     <form  method="POST">

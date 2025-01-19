@@ -34,7 +34,7 @@ function loginCheck()
 function commonUserCheck()
 {
     if (!isset($_SESSION["login"]) || !isset($_SESSION["user_name"]) || $_SESSION["user_name"] === "ec_admin") {
-        header("Location: ./login.php");
+        header("Location: ./index.php");
         exit();
     }
 }
@@ -130,6 +130,25 @@ function sqlFetchData($sql, $params = [], $singleRow = false)
     }
 }
 
+//ログインしていたらセッション情報からユーザー名を取得
+function getUserName()
+{
+    if (isset($_SESSION["user_name"])) {
+        $user_name = $_SESSION["user_name"];
+        return  $user_name;
+    } else {
+        return "";
+    }
+}
+
+//ログインしていたら挨拶する
+function helloUser($user_name)
+{
+    if (!empty($user_name)) {
+        $message =  'こんにちは、' . $user_name . 'さん';
+        return $message;
+    }
+}
 
 //SQL実行
 function sqlFetch($sql)

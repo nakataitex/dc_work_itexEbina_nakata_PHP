@@ -7,6 +7,10 @@ require_once "../../include/test/model/manage_model.php";
 
 session_start();
 adminCheck();
+
+//ユーザー名を表示して挨拶
+$user_name = helloUser(getUserName());
+
 $message = [];
 $error_message = [];
 $pdo = getConnection();
@@ -64,7 +68,9 @@ $stylesheet = CSS_DIR;
 $page_title = "商品管理";
 //ページリンク
 $menus = [
-    "./catalog_test.php" => "商品一覧ページ(テスト)",
+    "./manage.php" => "商品管理ページ",
+    "#1" => "お問い合わせ確認(準備中)",
+    "#2" => "商品のアナリティクス(準備中)",
     "./logout.php" => "ログアウト"
 ];
 

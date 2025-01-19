@@ -7,6 +7,8 @@ require_once '../../include/test/model/purchase_model.php';
 
 session_start();
 commonUserCheck();
+//ユーザー名を表示して挨拶
+$user_name = helloUser(getUserName());
 
 $message = [];
 $error_message = [];
@@ -36,6 +38,8 @@ $page_title = "購入完了";
 //ページリンク
 $menus = [
     "./catalog.php" => "商品一覧",
+    "#1" => "注文履歴(準備中)",
+    "#2" => "アカウント(準備中)",
     "./logout.php" => "ログアウト"
 ];
 

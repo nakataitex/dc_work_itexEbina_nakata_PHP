@@ -1,1 +1,1 @@
-<p><a href="./login.php">ログインする</a></p>
+<p><a href="./index.php">ログインする</a></p>

@@ -74,27 +74,149 @@ function getCatalog()
     WHERE p.public_flg = 1";
     return sqlFetchData($sql);
 }
-;
 
-//商品リストを表示（テスト）
-function getCatalogVariable($pagination_limit = DEFAULT_PAGINATION_LIMIT, $page_num = 0)
+
+function sqlfetchDataTest($sql, $params = [], $singleRow = false)
 {
-    if (isset($_GET["pagination_limit"])) {
-        $pagination_limit = $_GET["pagination_limit"];
-    }
+    try {
+        $pdo = getConnection();
+        $stmt = $pdo->prepare($sql);
 
-    if (isset($_GET["page_num"])) {
-        $page_num = $_GET["page_num"];
-    }
+        foreach ($params as $key => $param) {
+            $value = $param['value'];
+            $type = $param['type'] ?? PDO::PARAM_STR; // 型が指定されていない場合は文字列型
 
-    $sql = 'SELECT p.product_id, p.product_name, p.price,i.image_name,s.stock_qty 
+            $stmt->bindValue($key, $value, $type); // 型を指定
+        }
+
+        $result = $stmt->execute();
+        if ($result) {
+            if (stripos($sql, 'SELECT') === 0) {
+                if ($singleRow) {
+                    return $stmt->fetch(PDO::FETCH_ASSOC);
+                } else {
+                    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+                }
+            } else {
+                return $stmt->rowCount();
+            }
+        } else {
+            return false;
+        }
+    } catch (PDOException $e) {
+
+        error_log("SQL Error: " . $sql . "\n" . $e->getMessage());
+        throw new Exception("データベースエラー: " . $e->getMessage());
+    }
+}
+
+//商品リストを表示（分割）
+function getCatalogVariable($pdo, $product_public_flg)
+{
+
+    $pagination_limit = isset($_GET["limit"]) ? intval($_GET["limit"]) : DEFAULT_PAGINATION_LIMIT;
+    $page_num = isset($_GET["page_num"]) ? intval($_GET["page_num"]) : 0;
+
+    //2ページ目以降ページ毎に表示内容を変更
+    $currently_displayed_item = $page_num * $pagination_limit;
+
+    //SQL
+    try {
+        $sql = 'SELECT p.product_id, p.product_name, p.price,i.image_name,s.stock_qty 
         FROM ec_stock_table_test s 
         INNER JOIN ec_image_table_test i 
         ON s.product_id = i.product_id 
         JOIN ec_product_table_test p 
         ON i.product_id = p.product_id 
-        WHERE p.public_flg = 1 
-        LIMIT ' . $pagination_limit . ' 
-        OFFSET ' . $page_num;
-    return sqlFetchData($sql);
+        WHERE p.public_flg = :public_flg 
+        LIMIT :limit
+        OFFSET :offset';
+        $params = [
+            ":public_flg" => ['value' => $product_public_flg, 'type' => PDO::PARAM_INT],
+            ":limit" => ['value' => $pagination_limit, 'type' => PDO::PARAM_INT],
+            ":offset" => [
+                'value' => $currently_displayed_item,
+                'type' => PDO::PARAM_INT
+            ]
+        ];
+        $result = sqlfetchDataTest($sql, $params);
+        if ($result) {
+            return $result;
+        } else {
+            throw new Exception("商品データがありません。");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("データベースエラー:商品の取得に失敗しました");
+    }
+}
+
+
+
+
+function getOrderDetails($pdo)
+{
+    $order_id = $_SESSION["order_id"];
+    $sql = "SELECT p.product_name, od.product_qty, od.price,i.image_name
+        FROM ec_order_details_table_test od
+        INNER JOIN ec_product_table_test p ON od.product_id = p.product_id 
+                INNER JOIN ec_image_table_test i ON p.product_id = i.product_id WHERE od.order_id = :order_id";
+    $param = [":order_id" => $order_id];
+    $result = sqlFetchData($sql, $param);
+    if ($result) {
+        return $result;
+    }
+}
+
+//現在のページを取得
+function getPageNum()
+{
+    if (!isset($_GET["page_num"])) {
+        //設定されてない場合は1ページ目にする。
+        return $page_num = 0;
+    } elseif ($_GET["page_num"] === 0) {
+        return $page_num = $_GET["page_num"];
+    } else {
+        if ($_GET["page_num"] > 0)
+            $page_num = h($_GET["page_num"]);
+        print $page_num;
+        return $page_num;
+    }
+}
+
+//ページネーションの総ページ数を取得
+function getMaxPageNum($pagination_limit, $catalog_num)
+{
+    $max_page_num = ceil($catalog_num / $pagination_limit);
+    return $max_page_num;
+}
+
+function getParamSanitize($get_status)
+{
+    if (isset($_GET[$get_status])) {
+        $status = $_GET[$get_status];
+        if ($status === $_GET["limit"]) {
+        } elseif ($status === $_GET["page_num"]) {
+        }
+    }
+}
+
+//GETステータスが正しいか確認
+function sanitizeInt($status_name, $default_status, $max_status)
+{
+    if (isset($_GET[$status_name])) {
+        //GETパラメータの数値が正しければそのまま使用
+        $status = $_GET[$status_name];
+        $pattern = '/^[1-9][0-9]*$/';
+        if (preg_match($pattern, $status) && $max_status >= $status && 0 <= $status) {
+            return $status;
+        } else {
+            //GETパラメータがない、もしくは不正な場合デフォルト値を使用
+            $status = $default_status;
+            return $status;
+        }
+    } else {
+        //GETパラメータがない、もしくは不正な場合デフォルト値を使用
+        $status = $default_status;
+        return $status;
+    }
 }
