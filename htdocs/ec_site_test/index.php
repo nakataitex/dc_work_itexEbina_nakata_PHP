@@ -53,5 +53,5 @@ $menus = [
 
 //viewファイル読み込み
 include_once "../../include/test/view/header_view.php";
-include_once "../../include/test/view/login_view.php";
+include_once "../../include/test/view/index_view.php";
 include_once "../../include/test/view/footer_view.php";
